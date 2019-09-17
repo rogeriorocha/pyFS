@@ -17,6 +17,7 @@ class FileStorage:
         self.path = os.path.join(path, self.lvl_0, self.lvl_1)
         self.file = os.path.join(self.path, str(id))
         self.fileHash = self.file + FILE_HASH_EXT
+        self.filename = str(id)
     def exists(self):
        return os.path.exists(self.file)
 

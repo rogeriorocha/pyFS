@@ -6,12 +6,21 @@ import os
 from application.models import ArquivoCategoria, ArquivoDado, db
 
 
+def getFileName(id):
+    ad = db.session.query(ArquivoDado).get(id)
+    print(ad.nom_orig)
+    return ad.nom_orig
+
+    
+
+
 def upload(file):
     ad = ArquivoDado()
     db.session.add(ad)
     db.session.commit()
     
     codArq = ad.cod_arq
+    
 
     fs = FileStorage(codArq)
     filename = secure_filename(file.filename)

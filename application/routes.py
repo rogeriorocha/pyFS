@@ -1,10 +1,11 @@
-from flask import Flask, request, make_response, flash, redirect, jsonify
+from flask import Flask, request, make_response, flash, redirect, jsonify, send_from_directory
 from flask import current_app as app
 
 import json
 import urllib.request
 import os
-from application import service
+from application import service, storage
+
 
 @app.route('/upload/', methods=['POST'])
 def upload_file():
@@ -31,6 +32,14 @@ def upload_file():
         response.content_type = "application/json"    
     
         return response
+
+
+@app.route('/download/<path:id>', methods=['GET'])
+def download(id):
+    sf = storage.FileStorage(id)
+    filename = service.getFileName(id)
+    return send_from_directory(sf.path, sf.filename, as_attachment=True, attachment_filename=filename)
+    
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
