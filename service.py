@@ -2,8 +2,18 @@ from storage import FileStorage, HashUtils
 from werkzeug.utils import secure_filename
 import os
 
+
+from model import ArquivoCategoria, ArquivoDado
+from session import session
+
 def upload(file):
-    codArq = 1
+    ad = ArquivoDado()
+    session.add(ad)
+    
+    codArq = ad.cod_arq
+
+    print(codArq)
+
     fs = FileStorage(codArq)
     filename = secure_filename(file.filename)
     #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -15,4 +25,5 @@ def upload(file):
     with open(fs.fileHash, 'w') as fileMd5:
         fileMd5.write(hashFileMD5)   
 
+    
     return codArq

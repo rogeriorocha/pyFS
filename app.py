@@ -8,7 +8,7 @@ import service
 app = Flask("fs")
 
 
-from werkzeug.utils import secure_filename
+
 
 #UPLOAD_FOLDER='c:/temp/stored'
 
