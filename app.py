@@ -3,6 +3,8 @@ from flask import Flask, request, make_response, flash, redirect, jsonify
 import json
 import urllib.request
 import os
+from storage import FileStorage, HashUtils
+
 app = Flask("fs")
 
 
@@ -63,10 +65,29 @@ def upload_file():
         if file.filename == '':
             flash('No file selected for uploading')
             return redirect(request.url)            
+
+        codArq = 1
+        fs = FileStorage(codArq)
+            
+
+
+        print(fs.exists())    
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        os.makedirs(fs.path, exist_ok=True)
+        file.save(fs.file)
+        hashFileMD5 = HashUtils.getFileMD5(fs.file)
+        print(fs.exists())
+
+        
+        
+        
+        with open(fs.fileHash, 'w') as fileMd5:
+            fileMd5.write(hashFileMD5)        
+        
+
         flash('File successfully uploaded')
-        pessoas = {"codArq": 1}
+        pessoas = {"codArq": codArq}
         response = make_response(json.dumps(pessoas))
         response.content_type = "application/json"    
     
