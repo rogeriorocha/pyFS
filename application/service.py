@@ -8,7 +8,7 @@ from application.models import ArquivoCategoria, ArquivoDado, db
 
 def getFileName(id):
     ad = db.session.query(ArquivoDado).get(id)
-    print(ad.nom_orig)
+
     return ad.nom_orig
 
     
@@ -33,18 +33,22 @@ def upload(file):
 
     hashFileMD5 = HashUtils.getFileMD5(fs.file)
 
-    #fileSize = os.path.getsize(file)
-    #ad.tam_arq = fileSize
+    fileSize = _file_size(fs.file)
+    print(fileSize)
+
+    ad.tam_arq = fileSize
     ad.nom_orig = filename;
     ad.cod_algtm_hash = hashFileMD5;
 
     db.session.flush();
     db.session.commit();
 
-    print(fs.exists())
-    
     with open(fs.fileHash, 'w') as fileMd5:
         fileMd5.write(hashFileMD5)   
 
     
     return codArq
+
+def _file_size(fname):
+        statinfo = os.stat(fname)
+        return statinfo.st_size
