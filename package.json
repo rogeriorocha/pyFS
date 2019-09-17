@@ -1,0 +1,11 @@
+{
+  "name": "pyfs",
+  "version": "1.0.0",
+  "description": "FileServer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rogerio Rocha (rogeriosilvarocha@gmail.com)",
+  "license": "ISC"
+}
