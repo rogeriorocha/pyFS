@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, flash, redirect, jsonify, send_from_directory
+from flask import Flask, request, make_response, flash, redirect, jsonify, send_from_directory, Response
 from flask import current_app as app
 
 import json
@@ -6,7 +6,20 @@ import urllib.request
 import os
 from application import service, storage
 
+class InvalidUsage(Exception):
+    status_code = 400
 
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
 
 @app.route('/upload/<int:categoria>', methods=['POST'])
 @app.route('/upload/', methods=['POST'])
@@ -56,14 +69,23 @@ def filename(id):
 
 
 
-@app.route('/union/<string:arquivos>', methods=['POST'])
-def union(arquivos):
-    codArq = service.union(1,3) 
-
-    print(codArq)
-
-    resp = {"codArq": codArq}
-    response = make_response(json.dumps(resp))
-    response.content_type = "application/json"    
-    return response
+@app.route('/union/<arquivos>', methods=['POST'])
+def union(arquivos=None):
+    if arquivos == None:
+        raise InvalidUsage('"arquivos" not present', status_code=500)
+    lstArq = arquivos.split(",")
     
+    if len(lstArq) <= 1:
+        raise InvalidUsage('"arquivos" deve conter mais de um codigo de arquivo', status_code=500)
+
+
+    codArq = service.union(lstArq) 
+    
+    print(codArq)
+    data = {
+        'codArq'  : codArq
+    }
+    js = json.dumps(data)
+
+    resp = Response(js, status=200, mimetype='application/json')
+    return resp

@@ -55,11 +55,11 @@ def _file_size(fname):
 
 
 
-def union(*args):
+def union(listArq):
     files = ()
 
 
-    for codArq in args:
+    for codArq in listArq:
         sf = FileStorage(codArq)
         files = files +(str(sf.file),)
 

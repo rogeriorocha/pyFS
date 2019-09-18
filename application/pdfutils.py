@@ -3,8 +3,10 @@ import os
 import PyPDF2
 import tempfile
 
+
+
 def union(args):
-        new_file, userfilename = tempfile.mkstemp()
+        _, userfilename = tempfile.mkstemp()
 
         # Get all the PDF filenames
         pdf2merge = args
@@ -33,6 +35,7 @@ def union(args):
                         #Outputting the PDF
                         pdfWriter.write(pdfOutput)
                         
+                        
 
                 finally:
                         #Closing the PDF writer
@@ -50,3 +53,6 @@ def union(args):
 from werkzeug.utils import secure_filename
 file =secure_filename("C:\\Users\\rpsr\\a.exe")    
 print(file)
+
+
+
