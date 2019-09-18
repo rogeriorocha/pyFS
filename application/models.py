@@ -3,7 +3,7 @@ from . import db
 #import sqlalchemy as db
 
 #from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func
-#from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref
 #from sqlalchemy import create_engine, schema, types
 #from sqlalchemy.ext.declarative import declarative_base
 #import os
@@ -28,8 +28,8 @@ class ArquivoDado(db.Model):
     cod_arq = db.Column(db.Integer, primary_key=True,  autoincrement=True )
     end_arq = db.Column(db.String(100))
     nom_orig = db.Column(db.String(100))
-    #cod_categ = db.Column(Integer, ForeignKey('arquivo_categoria.cod_categ'))
-    #categoria = relationship(ArquivoCategoria)
+    cod_categ = db.Column(db.Integer, db.ForeignKey('arquivo_categoria.cod_categ'))
+    categoria = relationship(ArquivoCategoria)
     dat_incl = db.Column(db.DateTime, default=db.func.now())
     cod_algtm_hash = db.Column(db.String(50))
     tam_arq = db.Column(db.Integer)
