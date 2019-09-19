@@ -127,7 +127,7 @@ class FSFilenameResource(Resource):
         return response
 
 
-@name_space.route("/watermark/<int:id>", doc={"description": "Cria marca d'agua em um arquivo PDF", },)
+@name_space.route("/watermark/<int:id>", doc={"description": "Cria marca d'agua em um arquivo PDF", "deprecated": True,},)
 class FSWatermarkResource(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={'id': 'Id de um arquivo PDF associado ao FileServer', 'texto':'texto do watermark'})
@@ -136,7 +136,7 @@ class FSWatermarkResource(Resource):
         pass
 
 
-@name_space.route("/delete/<int:id>", doc={"description": "Deleta e arquivo do FS", },)
+@name_space.route("/delete/<int:id>", doc={"description": "Deleta e arquivo do FS", "deprecated": True,},)
 class DeleteRS(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={'id': 'Id associado ao FileServer'})
