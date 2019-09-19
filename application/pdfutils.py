@@ -15,8 +15,6 @@ def union(args):
 
         print(len(pdf2merge))
 
-
-
         #loop through all PDFs
         for filename in list(pdf2merge):
                 #rb for read binary

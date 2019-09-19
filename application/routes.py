@@ -58,8 +58,6 @@ class Union(Resource):
             raise InvalidUsage('"arquivos" deve conter mais de um codigo de arquivo', status_code=500)
 
         codArq = service.union(lstArq) 
-        
-        print(codArq)
         data = {
             'codArq'  : codArq
         }
@@ -110,9 +108,7 @@ class FSDownloadResource(Resource):
         filename = service.getFileName(id)
         return send_from_directory(sf.path, sf.filename, as_attachment=True, attachment_filename=filename)
 
-
-
-@name_space.route("/filename/<int:id>", doc={"description": "Retorna o filename de um arquivo", },)
+@name_space.route("/filename/<int:id>", doc={"description": "Retorna o nome original do arquivo", },)
 class FSFilenameResource(Resource):
     #name_space.route("/filename/<int:id>")
     #app.route('/filename/<int:id>', methods=['GET'])
@@ -127,7 +123,7 @@ class FSFilenameResource(Resource):
         return response
 
 
-@name_space.route("/watermark/<int:id>", doc={"description": "Cria marca d'agua em um arquivo PDF", "deprecated": True,},)
+@name_space.route("/watermark/<int:id>", doc={"description": "Cria marca d'agua em um arquivo PDF", "deprecated": False,},)
 class FSWatermarkResource(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={'id': 'Id de um arquivo PDF associado ao FileServer', 'texto':'texto do watermark'})
@@ -136,10 +132,12 @@ class FSWatermarkResource(Resource):
         pass
 
 
-@name_space.route("/delete/<int:id>", doc={"description": "Deleta e arquivo do FS", "deprecated": True,},)
+@name_space.route("/delete/<int:id>", doc={"description": "Deleta e arquivo do FS"},)
 class DeleteRS(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={'id': 'Id associado ao FileServer'})
     #@app.route('/download/<int:id>', methods=['GET'])
     def delete(self, id):
-        pass
+        service.delete(id)
+        resp = Response("{}", status=200, mimetype='application/json')
+        return resp

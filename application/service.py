@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 import os
 
 
-from application.models import ArquivoCategoria, ArquivoDado, db
+from application.models import ArquivoCategoria, ArquivoDado, db, SimNaoEnum
 from application.pdfutils import union as pdfUtils_union
 from shutil import copyfile
 
@@ -16,6 +16,19 @@ def getFileName(id):
     ad = db.session.query(ArquivoDado).get(id)
 
     return ad.nom_orig
+
+def delete(id):
+    fs = FileStorage(id)
+    if os.path.exists(fs.file):
+        os.remove(fs.file)
+
+    if os.path.exists(fs.fileHash):
+        os.remove(fs.fileHash)
+
+    ad = db.session.query(ArquivoDado).get(id)
+    ad.flg_ati = SimNaoEnum.N
+    db.session.commit();
+    db.session.flush();    
 
 def upload(file, categoria):
     ad = ArquivoDado()
@@ -31,11 +44,9 @@ def upload(file, categoria):
     os.makedirs(fs.path, exist_ok=True)
     file.save(fs.file)
 
-
     hashFileMD5 = HashUtils.getFileMD5(fs.file)
 
     fileSize = _file_size(fs.file)
-    
 
     ad.tam_arq = fileSize
     ad.nom_orig = filename;
@@ -53,21 +64,21 @@ def _file_size(fname):
     statinfo = os.stat(fname)
     return statinfo.st_size
 
-
-
 def union(listArq):
     files = ()
 
-
+    strCodArq = "union="
     for codArq in listArq:
+        strCodArq = strCodArq + codArq+","
         sf = FileStorage(codArq)
-        files = files +(str(sf.file),)
+        files = files + (str(sf.file),)
+
+    strCodArq = strCodArq[:-1]
 
     filename = pdfUtils_union(files)
 
     ad = ArquivoDado()
-    ad.cod_categ = 1 
-    #FILE_CATEGORIA_UNION
+    ad.cod_categ = FILE_CATEGORIA_UNION
     db.session.add(ad)
     db.session.commit()
     
@@ -77,10 +88,7 @@ def union(listArq):
     os.makedirs(fs.path, exist_ok=True)
 
     copyfile(filename, fs.file)
-    print(filename)
-    print(fs.file)
 
-    #os.remove(filename)
 
     hashFileMD5 = HashUtils.getFileMD5(fs.file)
     fileSize = _file_size(fs.file)
@@ -88,10 +96,10 @@ def union(listArq):
     ad.tam_arq = fileSize
     ad.nom_orig = "union.pdf"
     ad.cod_algtm_hash = hashFileMD5;
+    ad.dsc_arq = strCodArq
 
     db.session.commit();
     db.session.flush();
-    
 
     with open(fs.fileHash, 'w') as fileMd5:
         fileMd5.write(hashFileMD5)      

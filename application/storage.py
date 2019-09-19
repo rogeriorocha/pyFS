@@ -24,11 +24,3 @@ class FileStorage:
 class HashUtils:
    def getFileMD5(filename):
        return hashlib.md5(open(filename,'rb').read()).hexdigest().upper()
-
-    
-
-#st = Storage(1)
-#print(st.id)
-#print(st.lvl_0)
-#print(st.lvl_1)
-#print(st.)
