@@ -1,6 +1,6 @@
 from flask import Flask, request, make_response, flash, redirect, jsonify, send_from_directory, Response
 from flask import current_app as app
-
+from datetime import datetime
 
 import json
 import urllib.request
@@ -15,9 +15,22 @@ api = Api(app = app,
                 title = "FileServer Resource", 
                 description = "File Server Resource") 
 
+
+
+def valid_date(s):
+    try:
+        return datetime.strptime(s, '%d-%m-%YT%H:%M:%S')
+    except ValueError:
+        msg = "Not a valid date: '{0}'.".format(s)
+        raise argparse.ArgumentTypeError(msg)
+
 upload_parser = api.parser()
 upload_parser.add_argument('arquivo', location='files', type=FileStorage, required=True)
 upload_parser.add_argument('categoria', location='path', type=int, required=False, default=service.FILE_CATEGORIA_DEFAULT) 
+
+#upload_parser.add_argument('dataExpurgo', location='path', type=lambda x: datetime.strptime(x,'%d-%m-%YT%H:%M:%S'), required=False, default=None) 
+upload_parser.add_argument('dataExpurgo', location='path', type=valid_date, required=False, default=None) 
+
 upload_parser.add_argument('descricao', location='path', type='string', required=False)
 upload_parser.add_argument('codigoUsuario', location='path', type='string', required=False, default="118104")
 
@@ -25,6 +38,8 @@ upload_parser.add_argument('codigoUsuario', location='path', type='string', requ
 waterkark_parser = api.parser()
 waterkark_parser.add_argument('id', location='path', type=int, required=True) 
 waterkark_parser.add_argument('texto', location='path', type='string', required=True)
+waterkark_parser.add_argument('filename', location='path', type='string', required=False, default=service.WATERMARK_DEFAULT_FILENAME)
+
 
 name_space = api.namespace('FS', description='File Server operations')
 
@@ -70,13 +85,30 @@ class Union(Resource):
 @name_space.route("/upload/"
     ,"/upload/<int:categoria>/"
     ,doc={"description": "Faz upload de um arquivo", },)
-@name_space.expect(upload_parser)
+
 class UploadResource(Resource):
+    @name_space.expect(upload_parser, )
     def post(self, categoria=None):
+        
+        """
+        https://stackoverflow.com/questions/55958486/how-to-validate-date-type-in-post-payload-with-flask-restplus
+        """
+        
+        
         if categoria == None:
             categoria = service.FILE_CATEGORIA_DEFAULT
 
         descricao = request.args.get("descricao")
+
+        dataExpurgo = request.args.get("dataExpurgo")
+        print(dataExpurgo)
+        print(type(dataExpurgo))
+
+        #date_object = datetime.strptime(dataExpurgo, '%d-%m-%YT%H:%M:%S').time
+
+        
+        #print(date_object)
+
         FILE_ATTACHED = 'arquivo'
         if FILE_ATTACHED not in request.files:
             flash('No file part')
@@ -111,8 +143,6 @@ class FSDownloadResource(Resource):
 
 @name_space.route("/filename/<int:id>", doc={"description": "Retorna o nome original do arquivo", },)
 class FSFilenameResource(Resource):
-    #name_space.route("/filename/<int:id>")
-    #app.route('/filename/<int:id>', methods=['GET'])
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={ 'id': 'Id associado ao FileServer'})
     def get(self,id):
@@ -142,7 +172,11 @@ class watermark(Resource):
         if not texto:
             raise InvalidUsage('"texto" not present', status_code=500)
 
-        codArq = service.watermark(id, texto) 
+        filename = request.args.get("filename") 
+        if not filename:
+            filename = service.WATERMARK_DEFAULT_FILENAME
+
+        codArq = service.watermark(id, texto, filename) 
         data = {
             'codArq'  : codArq
         }

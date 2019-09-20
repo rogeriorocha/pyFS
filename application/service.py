@@ -14,6 +14,9 @@ FILE_CATEGORIA_DEFAULT = 1
 FILE_CATEGORIA_UNION = 26
 FILE_CATEGORIA_WATERMARK = 27
 
+WATERMARK_DEFAULT_FILENAME = "watermark.pdf"
+UNION_DEFAULT_FILENAME = "union.pdf"
+
 def getArquivoDado(id):
     return db.session.query(ArquivoDado).get(id)
 
@@ -90,7 +93,7 @@ def upload(file, categoria, descricao):
     
     return codArq
 
-def watermark(id, texto):
+def watermark(id, texto, filenameDefault):
     sf = FileStorage(id)
     
     filename=pdfUtils_watermark(str(sf.file), texto)
@@ -110,8 +113,8 @@ def watermark(id, texto):
     fileSize = _file_size(fs.file)
 
     ad.tam_arq = fileSize
-    ad.nom_orig = "watermark.pdf"
-    ad.cod_algtm_hash = hashFileMD5;
+    ad.nom_orig = filenameDefault
+    ad.cod_algtm_hash = hashFileMD5
     ad.dsc_arq = strCodArq
 
     db.session.commit();
