@@ -6,25 +6,19 @@ import json
 import urllib.request
 import os
 from application import service, storage
-
-from flask_restplus import Api, Resource, fields
-
-
+from flask_restplus import Api, Resource, fields, inputs
 from werkzeug.datastructures import FileStorage
 from application.models import SimNaoEnum
-
-
 
 api = Api(app = app, 
                 version = "1.0", 
                 title = "FileServer Resource", 
                 description = "File Server Resource") 
 
-
 upload_parser = api.parser()
-upload_parser.add_argument('arquivo', location='files',
-                           type=FileStorage, required=True) 
-#upload_parser.add_argument('categoria', type=int, required=false, default=service.FILE_CATEGORIA_DEFAULT)                           
+upload_parser.add_argument('arquivo', location='files', type=FileStorage, required=True, help="Nao pode ser vazio") 
+upload_parser.add_argument('categoria', location='path', type=int, required=False, default=service.FILE_CATEGORIA_DEFAULT) 
+upload_parser.add_argument('descricao', location='path', type='string', required=False)
 
 
 name_space = api.namespace('FS', description='File Server operations')
@@ -46,6 +40,7 @@ class InvalidUsage(Exception):
 
 
 @name_space.route("/union/<arquivos>", doc={"description": "Unir dois ou mais arquivos PDFs", },)
+
 class Union(Resource):
     #@app.route('/union/<arquivos>', methods=['POST'])
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
@@ -68,14 +63,16 @@ class Union(Resource):
         resp = Response(js, status=200, mimetype='application/json')
         return resp
 
-@name_space.route("/upload/<int:categoria>", doc={"description": "Faz upload de um arquivo", },)
+@name_space.route("/upload/<int:categoria>/", 
+    doc={"description": "Faz upload de um arquivo", },)
 @name_space.expect(upload_parser)
 class UploadResource(Resource):
-    #@app.route('/upload/<int:categoria>', methods=['POST'])
-    #@app.route('/upload/', methods=['POST'])
-    @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
-			 params={'categoria': 'categoria do arquivo' })
-    def post(self, categoria=service.FILE_CATEGORIA_DEFAULT):
+    def post(self, categoria=None):
+        #service.FILE_CATEGORIA_DEFAULT
+
+
+        #args = upload_parser.parse_args()
+        descricao = request.args.get("descricao")
         FILE_ATTACHED = 'arquivo'
         #if request.method == 'POST':
         if FILE_ATTACHED not in request.files:
@@ -89,8 +86,7 @@ class UploadResource(Resource):
             flash('No arquivo selected for uploading')
             return redirect(request.url)            
         
-        codArq = service.upload(file, categoria)
-        
+        codArq = service.upload(file, categoria, descricao)
 
         flash('File successfully uploaded')
         resp = {"codArq": codArq}
@@ -98,7 +94,6 @@ class UploadResource(Resource):
         response.content_type = "application/json"    
 
         return response    
-
 
 @name_space.route("/download/<int:id>", doc={"description": "Faz download de um arquivo", },)
 class FSDownloadResource(Resource):

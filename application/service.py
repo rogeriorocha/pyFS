@@ -55,7 +55,7 @@ def __insertNext(categoria):
         raise
 
 
-def upload(file, categoria):
+def upload(file, categoria, descricao):
     """ problema no SQL Server com OUTPUT qndo trem trigger na tabela    
     ad = ArquivoDado()
     ad.cod_categ = categoria
@@ -79,7 +79,8 @@ def upload(file, categoria):
     #ad.cod_categ = categoria
     ad.tam_arq = fileSize
     ad.nom_orig = filename;
-    ad.cod_algtm_hash = hashFileMD5;
+    ad.cod_algtm_hash = hashFileMD5
+    ad.dsc_arq = descricao
 
     db.session.commit();
     db.session.flush();
