@@ -11,6 +11,7 @@ from flask_restplus import Api, Resource, fields
 
 
 from werkzeug.datastructures import FileStorage
+from application.models import SimNaoEnum
 
 
 
@@ -106,7 +107,8 @@ class FSDownloadResource(Resource):
     #@app.route('/download/<int:id>', methods=['GET'])
     def get(self, id):
         sf = storage.FileStorage(id)
-        filename = service.getFileName(id)
+        ad = service.getArquivoDado(id)
+        filename = ad.nom_orig
         return send_from_directory(sf.path, sf.filename, as_attachment=True, attachment_filename=filename)
 
 @name_space.route("/filename/<int:id>", doc={"description": "Retorna o nome original do arquivo", },)
@@ -116,8 +118,13 @@ class FSFilenameResource(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={ 'id': 'Id associado ao FileServer'})
     def get(self,id):
-        filename = service.getFileName(id)
-        resp = {"codArq": id, "nome": filename}
+        ad = service.getArquivoDado(id)
+        
+        resp = {"id": id, "nome": ad.nom_orig, "descricao": ad.dsc_arq, "hash":ad.cod_algtm_hash
+        #, "categoria":ad.categoria.dsc_categ
+        , "codigoCategoria":ad.cod_categ
+        , "ativo":ad.flg_ati == SimNaoEnum.S
+        }
         response = make_response(json.dumps(resp))
         response.content_type = "application/json"    
 
@@ -141,4 +148,15 @@ class DeleteRS(Resource):
     def delete(self, id):
         service.delete(id)
         resp = Response("{}", status=200, mimetype='application/json')
+        return resp
+
+
+@name_space.route("/expurga", doc={"description": "expurga arquivos expirados"},)
+class ExpurgaRS(Resource):
+    def post(self):
+        qtde = service.expurgar()
+        data = {'qtde'  : qtde}
+        js = json.dumps(data)
+
+        resp = Response(js, status=200, mimetype='application/json')
         return resp

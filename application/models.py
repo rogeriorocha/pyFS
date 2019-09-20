@@ -33,3 +33,5 @@ class ArquivoDado(db.Model):
 
     def __repr__(self):
          return "<ArquivoDado (id='%d', end_arq='%s', nom_orig='%s')>" % (self.cod_arq, self.end_arq, self.nom_orig)
+
+  

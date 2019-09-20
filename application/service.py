@@ -14,10 +14,8 @@ FILE_CATEGORIA_DEFAULT = 1
 FILE_CATEGORIA_UNION = 2
 FILE_CATEGORIA_WATERMARK = 2
 
-def getFileName(id):
-    ad = db.session.query(ArquivoDado).get(id)
-
-    return ad.nom_orig
+def getArquivoDado(id):
+    return db.session.query(ArquivoDado).get(id)
 
 def delete(id):
     fs = FileStorage(id)
@@ -30,9 +28,10 @@ def delete(id):
     ad = db.session.query(ArquivoDado).get(id)
     ad.flg_ati = SimNaoEnum.N
     db.session.commit();
-    db.session.flush();    
+    db.session.flush();
+    
 
-def insertNext(categoria):
+def __insertNext(categoria):
     connection = db.engine.connect()
     trans = connection.begin()
     try:
@@ -65,7 +64,7 @@ def upload(file, categoria):
     codArq = ad.cod_arq
     """
 
-    ad = db.session.query(ArquivoDado).get(insertNext(categoria))
+    ad = db.session.query(ArquivoDado).get(__insertNext(categoria))
     codArq = ad.cod_arq
     
     fs = FileStorage(codArq)
@@ -116,7 +115,7 @@ def union(listArq):
     codArq = ad.cod_arq
     """
     
-    ad = db.session.query(ArquivoDado).get(insertNext(FILE_CATEGORIA_UNION))
+    ad = db.session.query(ArquivoDado).get(__insertNext(FILE_CATEGORIA_UNION))
     codArq = ad.cod_arq    
     
 
@@ -141,3 +140,28 @@ def union(listArq):
         fileMd5.write(hashFileMD5)      
 
     return codArq
+
+def listaExpurgo():
+    lst = []
+    with db.engine.connect() as con:
+        sql = """
+            select top 1000 cod_arq
+            from bdseg.dbo.arquivo_dados
+            where (dat_expur is not null) 
+            and (dat_expur < getdate())
+            and flg_ati = 'S'
+            order by dat_expur"""
+        rs = con.execute(sql)
+        
+        for row in rs:
+            lst.append(row["cod_arq"])
+    return lst
+
+def expurgar():
+    lst = listaExpurgo()
+    qtde = 0
+    for codArq in lst:
+        delete(codArq)
+        qtde+=1
+    return qtde    
+

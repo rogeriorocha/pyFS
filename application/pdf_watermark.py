@@ -44,7 +44,7 @@ c.save()
 packet.seek(0)
 new_pdf = PdfFileReader(packet)
 # read your existing PDF
-existing_pdf = PdfFileReader(open(r"C:\Users\rpsr\temp\pythonTest\testWater.pdf", "rb"))
+existing_pdf = PdfFileReader(open(r"C:\Users\rpsr\Documents\python\pyFS\testWater.pdf", "rb"))
 output = PdfFileWriter()
 # add the "watermark" (which is the new pdf) on the existing page
 
@@ -53,6 +53,6 @@ for i in range(existing_pdf.getNumPages()):
     page.mergePage(new_pdf.getPage(0))
     output.addPage(page)
 # finally, write "output" to a real file
-outputStream = open(r"C:\Users\rpsr\temp\pythonTest\testWater_2.pdf", "wb")
+outputStream = open(r"C:\Users\rpsr\Documents\python\pyFS\testWater_out.pdf", "wb")
 output.write(outputStream)
 outputStream.close()
