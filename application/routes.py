@@ -11,8 +11,8 @@ from werkzeug.datastructures import FileStorage
 from application.models import SimNaoEnum
 
 api = Api(app = app, 
-                version = "1.0", 
-                title = "FileServer Resource", 
+                version = "0.1b", 
+                title = "FileServer", 
                 description = "File Server Resource") 
 
 
@@ -41,7 +41,7 @@ waterkark_parser.add_argument('texto', location='path', type='string', required=
 waterkark_parser.add_argument('filename', location='path', type='string', required=False, default=service.WATERMARK_DEFAULT_FILENAME)
 
 
-name_space = api.namespace('FS', description='File Server operations')
+name_space = api.namespace('FS', description='Endpoints')
 
 class InvalidUsage(Exception):
     status_code = 400
@@ -65,6 +65,7 @@ class Union(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={'arquivos': 'lista de dois ou mais ids de arquivos PDFs separadas por virgula.' }) 
     def post(self,arquivos=None):
+        """Unir arquivos PDF"""
         if arquivos == None:
             raise InvalidUsage('"arquivos" not present', status_code=500)
         arquivos = arquivos.replace(" ", "")
@@ -90,9 +91,9 @@ class UploadResource(Resource):
     @name_space.expect(upload_parser, )
     def post(self, categoria=None):
         
-        """
-        https://stackoverflow.com/questions/55958486/how-to-validate-date-type-in-post-payload-with-flask-restplus
-        """
+        """Incluir arquivo"""
+        #https://stackoverflow.com/questions/55958486/how-to-validate-date-type-in-post-payload-with-flask-restplus
+        
         
         
         if categoria == None:
@@ -131,21 +132,23 @@ class UploadResource(Resource):
         return response    
 
 @name_space.route("/download/<int:id>", doc={"description": "Faz download de um arquivo", },)
-class FSDownloadResource(Resource):
+class download(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={ 'id': 'Id associado ao FileServer'})
     #@app.route('/download/<int:id>', methods=['GET'])
     def get(self, id):
+        """Baixar arquivo"""
         sf = storage.FileStorage(id)
         ad = service.getArquivoDado(id)
         filename = ad.nom_orig
         return send_from_directory(sf.path, sf.filename, as_attachment=True, attachment_filename=filename)
 
-@name_space.route("/filename/<int:id>", doc={"description": "Retorna o nome original do arquivo", },)
-class FSFilenameResource(Resource):
+@name_space.route("/data/<int:id>", doc={"description": "Retorna o nome original do arquivo", },)
+class data(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={ 'id': 'Id associado ao FileServer'})
     def get(self,id):
+        """Retornar dados do arquivo"""
         ad = service.getArquivoDado(id)
         
         resp = {"id": id, "nome": ad.nom_orig, "descricao": ad.dsc_arq, "hash":ad.cod_algtm_hash
@@ -165,6 +168,7 @@ class watermark(Resource):
     #@api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 	#		 params={'id': 'Id de um arquivo PDF associado ao FileServer', 'texto':'texto do watermark'})
     def post(self, id):
+        """Criar novo arquivo PDF com marca d'agua"""
         if id == None:
             raise InvalidUsage('"id" not present', status_code=500)
 
@@ -193,14 +197,16 @@ class DeleteRS(Resource):
 			 params={'id': 'Id associado ao FileServer'})
     #@app.route('/download/<int:id>', methods=['GET'])
     def delete(self, id):
+        """Excluir arquivo """
         service.delete(id)
         resp = Response("{}", status=200, mimetype='application/json')
         return resp
 
 
 @name_space.route("/expurga", doc={"description": "expurga arquivos expirados"},)
-class ExpurgaRS(Resource):
+class expurgar(Resource):
     def post(self):
+        
         qtde = service.expurgar()
         data = {'qtde'  : qtde}
         js = json.dumps(data)
