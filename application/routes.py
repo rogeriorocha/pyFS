@@ -52,6 +52,7 @@ class Union(Resource):
     def post(self,arquivos=None):
         if arquivos == None:
             raise InvalidUsage('"arquivos" not present', status_code=500)
+        arquivos = arquivos.replace(" ", "")
         lstArq = arquivos.split(",")
         
         if len(lstArq) <= 1:

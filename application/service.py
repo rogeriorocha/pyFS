@@ -7,6 +7,8 @@ from application.models import ArquivoCategoria, ArquivoDado, db, SimNaoEnum
 from application.pdfutils import union as pdfUtils_union
 from shutil import copyfile
 
+from sqlalchemy import text
+from datetime import datetime
 
 FILE_CATEGORIA_DEFAULT = 1
 FILE_CATEGORIA_UNION = 2
@@ -30,14 +32,37 @@ def delete(id):
     db.session.commit();
     db.session.flush();    
 
+def insertNext(categoria):
+    connection = db.engine.connect()
+    trans = connection.begin()
+    try:
+        res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', GETDATE(),'+str(categoria)+') select next =SCOPE_IDENTITY()')
+        """
+        res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', :dat_incl, :cod_categ) select next =SCOPE_IDENTITY()'
+        , {'dat_incl':datetime.now(), 'cod_categ': categoria}
+        )
+        """
+        row = res.fetchone()
+        next = row['next']
+        trans.commit()
+        return next
+    except:
+        trans.rollback()
+        raise
+
+
 def upload(file, categoria):
+    """ problema no SQL Server com OUTPUT qndo trem trigger na tabela    
     ad = ArquivoDado()
     ad.cod_categ = categoria
     db.session.add(ad)
     db.session.commit()
-    
     codArq = ad.cod_arq
+    """
 
+    ad = db.session.query(ArquivoDado).get(insertNext(categoria))
+    codArq = ad.cod_arq
+    
     fs = FileStorage(codArq)
     filename = secure_filename(file.filename)
     #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -47,7 +72,7 @@ def upload(file, categoria):
     hashFileMD5 = HashUtils.getFileMD5(fs.file)
 
     fileSize = _file_size(fs.file)
-
+    #ad.cod_categ = categoria
     ad.tam_arq = fileSize
     ad.nom_orig = filename;
     ad.cod_algtm_hash = hashFileMD5;
@@ -77,12 +102,18 @@ def union(listArq):
 
     filename = pdfUtils_union(files)
 
+    
+    """
     ad = ArquivoDado()
     ad.cod_categ = FILE_CATEGORIA_UNION
     db.session.add(ad)
     db.session.commit()
-    
     codArq = ad.cod_arq
+    """
+    
+    ad = db.session.query(ArquivoDado).get(insertNext(FILE_CATEGORIA_UNION))
+    codArq = ad.cod_arq    
+    
 
     fs = FileStorage(codArq)
     os.makedirs(fs.path, exist_ok=True)

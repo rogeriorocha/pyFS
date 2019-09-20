@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 
+
 db = SQLAlchemy()
 
 
@@ -17,7 +18,9 @@ def create_app():
     #app.config.from_object('config.Config')
     
     # Remover
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///site.db'
+    #app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///site.db'
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'mssql+pymssql://sist_rpsr:Ho1#h=j4@desesqlbdmg:2002/bdseg'
+    #app.config["SQLALCHEMY_DATABASE_URI"] = 'mssql+pyodbc://sist_rpsr:Ho1#h=j4@SIST_DESE'
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.secret_key = "super secret key"
 
@@ -29,6 +32,6 @@ def create_app():
         from . import routes
 
         # Create tables for our models
-        db.create_all()
+        #db.create_all()
 
         return app
