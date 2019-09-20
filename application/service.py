@@ -36,7 +36,12 @@ def insertNext(categoria):
     connection = db.engine.connect()
     trans = connection.begin()
     try:
+
+        #now = datetime.now()
+        #now.strftime("%d/%m/%Y %H:%M:%S")
+
         res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', GETDATE(),'+str(categoria)+') select next =SCOPE_IDENTITY()')
+        #res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', GETDATE(),'+str(categoria)+') select next =SCOPE_IDENTITY()')
         """
         res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', :dat_incl, :cod_categ) select next =SCOPE_IDENTITY()'
         , {'dat_incl':datetime.now(), 'cod_categ': categoria}
