@@ -16,10 +16,15 @@ api = Api(app = app,
                 description = "File Server Resource") 
 
 upload_parser = api.parser()
-upload_parser.add_argument('arquivo', location='files', type=FileStorage, required=True, help="Nao pode ser vazio") 
+upload_parser.add_argument('arquivo', location='files', type=FileStorage, required=True)
 upload_parser.add_argument('categoria', location='path', type=int, required=False, default=service.FILE_CATEGORIA_DEFAULT) 
 upload_parser.add_argument('descricao', location='path', type='string', required=False)
+upload_parser.add_argument('codigoUsuario', location='path', type='string', required=False, default="118104")
 
+
+waterkark_parser = api.parser()
+waterkark_parser.add_argument('id', location='path', type=int, required=True) 
+waterkark_parser.add_argument('texto', location='path', type='string', required=True)
 
 name_space = api.namespace('FS', description='File Server operations')
 
@@ -40,7 +45,6 @@ class InvalidUsage(Exception):
 
 
 @name_space.route("/union/<arquivos>", doc={"description": "Unir dois ou mais arquivos PDFs", },)
-
 class Union(Resource):
     #@app.route('/union/<arquivos>', methods=['POST'])
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
@@ -63,18 +67,17 @@ class Union(Resource):
         resp = Response(js, status=200, mimetype='application/json')
         return resp
 
-@name_space.route("/upload/<int:categoria>/", 
-    doc={"description": "Faz upload de um arquivo", },)
+@name_space.route("/upload/"
+    ,"/upload/<int:categoria>/"
+    ,doc={"description": "Faz upload de um arquivo", },)
 @name_space.expect(upload_parser)
 class UploadResource(Resource):
     def post(self, categoria=None):
-        #service.FILE_CATEGORIA_DEFAULT
+        if categoria == None:
+            categoria = service.FILE_CATEGORIA_DEFAULT
 
-
-        #args = upload_parser.parse_args()
         descricao = request.args.get("descricao")
         FILE_ATTACHED = 'arquivo'
-        #if request.method == 'POST':
         if FILE_ATTACHED not in request.files:
             flash('No file part')
             content = {}
@@ -127,11 +130,26 @@ class FSFilenameResource(Resource):
 
 
 @name_space.route("/watermark/<int:id>", doc={"description": "Cria marca d'agua em um arquivo PDF", "deprecated": False,},)
-class FSWatermarkResource(Resource):
-    @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
-			 params={'id': 'Id de um arquivo PDF associado ao FileServer', 'texto':'texto do watermark'})
-    #@app.route('/download/<int:id>', methods=['GET'])
-    def post(self, id, texto):
+@name_space.expect(waterkark_parser)
+class watermark(Resource):
+    #@api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
+	#		 params={'id': 'Id de um arquivo PDF associado ao FileServer', 'texto':'texto do watermark'})
+    def post(self, id):
+        if id == None:
+            raise InvalidUsage('"id" not present', status_code=500)
+
+        texto = request.args.get("texto") 
+        if not texto:
+            raise InvalidUsage('"texto" not present', status_code=500)
+
+        codArq = service.watermark(id, texto) 
+        data = {
+            'codArq'  : codArq
+        }
+        js = json.dumps(data)
+
+        resp = Response(js, status=200, mimetype='application/json')
+        return resp        
         pass
 
 

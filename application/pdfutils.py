@@ -1,8 +1,11 @@
-
 import os
 import PyPDF2
 import tempfile
 
+from PyPDF2 import PdfFileWriter, PdfFileReader
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, inch
 
 
 def union(lst):
@@ -10,10 +13,7 @@ def union(lst):
 
         # Get all the PDF filenames
         pdf2merge = lst
-
         pdfWriter = PyPDF2.PdfFileWriter()
-
-
         #loop through all PDFs
         for filename in list(pdf2merge):
                 #rb for read binary
@@ -36,17 +36,40 @@ def union(lst):
                         pdfOutput.close()
         return userfilename
 
-#union(r"C:\Users\rpsr\Downloads\b.pdf", r"C:\Users\rpsr\Downloads\b.pdf")
+def watermark(filename, texto):
 
+        packet = io.BytesIO()
+        c = canvas.Canvas(packet,pagesize=letter)
+        c.translate(inch,inch)
+        c.setFont("Helvetica", 78)
 
-#tup1 = (12, 34.56)
-#tup1 = tup1 + (5,)
-#print(tup1)
+        c.setFillColorRGB(0.50, 0.50, 0.50)
+        c.setFillAlpha(0.50)
 
+        c.rotate(45)
+        c.drawCentredString(6 * inch, 1 * inch, texto)
 
-#from werkzeug.utils import secure_filename
-#file =secure_filename("C:\\Users\\rpsr\\a.exe")    
-#print(file)
+        c.save()
+        packet.seek(0)
+        new_pdf = PdfFileReader(packet)
+        filePdf= open(filename, "rb")
+        try:
+                existing_pdf = PdfFileReader(filePdf)
+                output = PdfFileWriter()
 
+                for i in range(existing_pdf.getNumPages()):
+                        page = existing_pdf.getPage(i)
+                        page.mergePage(new_pdf.getPage(0))
+                        output.addPage(page)
+                _, userfilename = tempfile.mkstemp()       
+                outputStream = open(userfilename, "wb")
+                try:
+                        output.write(outputStream)
+                finally:        
+                        outputStream.close()
+        finally:
+                filePdf.close()
+                pass
 
-
+        return userfilename        
+#print(watermark(r"C:\Users\rpsr\Documents\python\pyFS\testWater.pdf", "GO"))

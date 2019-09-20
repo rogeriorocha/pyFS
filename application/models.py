@@ -32,6 +32,6 @@ class ArquivoDado(db.Model):
     dsc_arq = db.Column(db.String(255))
 
     def __repr__(self):
-         return "<ArquivoDado (id='%d', end_arq='%s', nom_orig='%s')>" % (self.cod_arq, self.end_arq, self.nom_orig)
+         return "<ArquivoDado (cod_arq='%d', end_arq='%s', nom_orig='%s')>" % (self.cod_arq, self.end_arq, self.nom_orig)
 
   

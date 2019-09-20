@@ -4,15 +4,15 @@ import os
 
 
 from application.models import ArquivoCategoria, ArquivoDado, db, SimNaoEnum
-from application.pdfutils import union as pdfUtils_union
+from application.pdfutils import union as pdfUtils_union, watermark as pdfUtils_watermark
 from shutil import copyfile
 
 from sqlalchemy import text
 from datetime import datetime
 
 FILE_CATEGORIA_DEFAULT = 1
-FILE_CATEGORIA_UNION = 2
-FILE_CATEGORIA_WATERMARK = 2
+FILE_CATEGORIA_UNION = 26
+FILE_CATEGORIA_WATERMARK = 27
 
 def getArquivoDado(id):
     return db.session.query(ArquivoDado).get(id)
@@ -89,6 +89,40 @@ def upload(file, categoria, descricao):
         fileMd5.write(hashFileMD5)   
     
     return codArq
+
+def watermark(id, texto):
+    sf = FileStorage(id)
+    
+    filename=pdfUtils_watermark(str(sf.file), texto)
+    strCodArq="id="+str(id)+", texto="+texto
+
+    ad = db.session.query(ArquivoDado).get(__insertNext(FILE_CATEGORIA_WATERMARK))
+    codArq = ad.cod_arq    
+    
+
+    fs = FileStorage(codArq)
+    os.makedirs(fs.path, exist_ok=True)
+
+    copyfile(filename, fs.file)
+
+
+    hashFileMD5 = HashUtils.getFileMD5(fs.file)
+    fileSize = _file_size(fs.file)
+
+    ad.tam_arq = fileSize
+    ad.nom_orig = "watermark.pdf"
+    ad.cod_algtm_hash = hashFileMD5;
+    ad.dsc_arq = strCodArq
+
+    db.session.commit();
+    db.session.flush();
+
+    with open(fs.fileHash, 'w') as fileMd5:
+        fileMd5.write(hashFileMD5)      
+
+    return codArq
+
+
 
 def _file_size(fname):
     statinfo = os.stat(fname)
