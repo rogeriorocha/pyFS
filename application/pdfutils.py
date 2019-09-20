@@ -5,15 +5,14 @@ import tempfile
 
 
 
-def union(args):
+def union(lst):
         _, userfilename = tempfile.mkstemp()
 
         # Get all the PDF filenames
-        pdf2merge = args
+        pdf2merge = lst
 
         pdfWriter = PyPDF2.PdfFileWriter()
 
-        print(len(pdf2merge))
 
         #loop through all PDFs
         for filename in list(pdf2merge):
@@ -28,13 +27,10 @@ def union(args):
         print(len(pdf2merge))
         if len(pdf2merge) > 0:
                 #save PDF to file, wb for write binary
+                pdfOutput = open(userfilename, "wb")
                 try:
-                        pdfOutput = open(userfilename, "wb")
                         #Outputting the PDF
                         pdfWriter.write(pdfOutput)
-                        
-                        
-
                 finally:
                         #Closing the PDF writer
                         pdfOutput.close()
@@ -48,9 +44,9 @@ def union(args):
 #print(tup1)
 
 
-from werkzeug.utils import secure_filename
-file =secure_filename("C:\\Users\\rpsr\\a.exe")    
-print(file)
+#from werkzeug.utils import secure_filename
+#file =secure_filename("C:\\Users\\rpsr\\a.exe")    
+#print(file)
 
 
 

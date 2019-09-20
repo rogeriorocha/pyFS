@@ -24,4 +24,11 @@ class FileStorage:
 
 class HashUtils:
    def getFileMD5(filename):
-       return hashlib.md5(open(filename,'rb').read()).hexdigest().upper()
+        hasher = hashlib.md5()
+        with open(filename, 'rb') as afile:
+            buf = afile.read()
+            hasher.update(buf)
+        return hasher.hexdigest().upper()
+           
+    
+       #return hashlib.md5(open(filename,'rb').read()).hexdigest().upper()
