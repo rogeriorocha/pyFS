@@ -1,12 +1,13 @@
 from flask import Flask, request, make_response, flash, redirect, jsonify, send_from_directory, Response
 from flask import current_app as app
 from datetime import datetime
+import argparse
 
 import json
 import urllib.request
 import os
 from application import service, storage
-from flask_restplus import Api, Resource, fields, inputs
+from flask_restplus import Api, Resource, fields, inputs, reqparse
 from werkzeug.datastructures import FileStorage
 from application.models import SimNaoEnum
 
@@ -19,10 +20,13 @@ api = Api(app = app,
 
 def valid_date(s):
     try:
+        print("*****")
+        print(s)
         return datetime.strptime(s, '%d-%m-%YT%H:%M:%S')
-    except ValueError:
+    except :
         msg = "Not a valid date: '{0}'.".format(s)
-        raise argparse.ArgumentTypeError(msg)
+        raise ValueError('Not a valid date format')
+        #raise argparse.ArgumentTypeError(msg)
 
 upload_parser = api.parser()
 upload_parser.add_argument('arquivo', location='files', type=FileStorage, required=True)
@@ -30,7 +34,6 @@ upload_parser.add_argument('categoria', location='path', type=int, required=Fals
 
 #upload_parser.add_argument('dataExpurgo', location='path', type=lambda x: datetime.strptime(x,'%d-%m-%YT%H:%M:%S'), required=False, default=None) 
 upload_parser.add_argument('dataExpurgo', location='path', type=valid_date, required=False, default=None) 
-
 upload_parser.add_argument('descricao', location='path', type='string', required=False)
 upload_parser.add_argument('codigoUsuario', location='path', type='string', required=False, default="118104")
 
@@ -58,6 +61,76 @@ class InvalidUsage(Exception):
         rv['message'] = self.message
         return rv
 
+"""
+payload = name_space.model('Payload', {
+    'categoria': fields.Integer(required=True),
+    'dataExpurgo': fields.Date(required=True)
+})
+"""
+
+@name_space.route("/upload/"
+    ,"/upload/<int:categoria>/"
+    ,doc={"description": "Faz upload de um arquivo", },)    
+class upload(Resource):
+    @name_space.expect(upload_parser, validate=True)
+    def post(self, categoria=None):
+        
+        """Incluir arquivo"""
+
+
+        parser = reqparse.RequestParser(bundle_errors=True)
+        parser.add_argument('categoria', type=str)
+        #parser.add_argument('dataExpurgo', type=lambda x: datetime.strptime(x,'%d-%m-%YT%H:%M:%S'), help="erro na data")
+        parser.add_argument('dataExpurgo', type=valid_date,help="erro na data")
+         
+        try:  # Will raise an error if date can't be parsed.
+            args = parser.parse_args()  # type "dict"
+            return jsonify(args)
+        except ValueError as e:
+            return  str(e), 400
+
+        #https://stackoverflow.com/questions/55958486/how-to-validate-date-type-in-post-payload-with-flask-restplus
+        
+        
+        
+        if categoria == None:
+            categoria = service.FILE_CATEGORIA_DEFAULT
+
+        descricao = request.args.get("descricao")
+
+        """
+        dataExpurgo = request.args.get("dataExpurgo")
+        print(dataExpurgo)
+        print(type(dataExpurgo))
+
+        #date_object = datetime.strptime(dataExpurgo, '%d-%m-%YT%H:%M:%S').time
+
+        
+        #print(date_object)
+        """
+
+        FILE_ATTACHED = 'arquivo'
+        if FILE_ATTACHED not in request.files:
+            flash('No file part')
+            content = {}
+            raise InvalidUsage('No "'+FILE_ATTACHED + '" part', status_code=500)
+            
+        file = request.files[FILE_ATTACHED]
+
+        if file.filename == '':
+            flash('No arquivo selected for uploading')
+            return redirect(request.url)            
+        
+        codArq = service.upload(file, categoria, descricao)
+
+        flash('File successfully uploaded')
+        resp = {"codArq": codArq}
+        response = make_response(json.dumps(resp))
+        response.content_type = "application/json"    
+
+        return response    
+
+
 
 @name_space.route("/union/<arquivos>", doc={"description": "Unir dois ou mais arquivos PDFs", },)
 class Union(Resource):
@@ -83,53 +156,8 @@ class Union(Resource):
         resp = Response(js, status=200, mimetype='application/json')
         return resp
 
-@name_space.route("/upload/"
-    ,"/upload/<int:categoria>/"
-    ,doc={"description": "Faz upload de um arquivo", },)
 
-class UploadResource(Resource):
-    @name_space.expect(upload_parser, )
-    def post(self, categoria=None):
-        
-        """Incluir arquivo"""
-        #https://stackoverflow.com/questions/55958486/how-to-validate-date-type-in-post-payload-with-flask-restplus
-        
-        
-        
-        if categoria == None:
-            categoria = service.FILE_CATEGORIA_DEFAULT
 
-        descricao = request.args.get("descricao")
-
-        dataExpurgo = request.args.get("dataExpurgo")
-        print(dataExpurgo)
-        print(type(dataExpurgo))
-
-        #date_object = datetime.strptime(dataExpurgo, '%d-%m-%YT%H:%M:%S').time
-
-        
-        #print(date_object)
-
-        FILE_ATTACHED = 'arquivo'
-        if FILE_ATTACHED not in request.files:
-            flash('No file part')
-            content = {}
-            raise InvalidUsage('No "'+FILE_ATTACHED + '" part', status_code=500)
-            
-        file = request.files[FILE_ATTACHED]
-
-        if file.filename == '':
-            flash('No arquivo selected for uploading')
-            return redirect(request.url)            
-        
-        codArq = service.upload(file, categoria, descricao)
-
-        flash('File successfully uploaded')
-        resp = {"codArq": codArq}
-        response = make_response(json.dumps(resp))
-        response.content_type = "application/json"    
-
-        return response    
 
 @name_space.route("/download/<int:id>", doc={"description": "Faz download de um arquivo", },)
 class download(Resource):
