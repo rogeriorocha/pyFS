@@ -1,3 +1,9 @@
+# PyFS
+File Server python
+
+##
+
+
 
 
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org PyPDF2
@@ -9,8 +15,7 @@ pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org flask_
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org pymssql
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org timeloop --user
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org reportlab --user
+pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org zlib --user
 
-
-#
 pip freeze > requirements.txt
 pip install -r requirements.txt
