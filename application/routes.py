@@ -3,6 +3,8 @@ from flask import current_app as app
 from datetime import datetime
 import argparse
 
+
+
 import json
 import urllib.request
 import os
@@ -10,6 +12,9 @@ from application import service, storage
 from flask_restplus import Api, Resource, fields, inputs, reqparse
 from werkzeug.datastructures import FileStorage
 from application.models import SimNaoEnum
+
+
+
 
 api = Api(app = app, 
                 version = "0.1b", 
@@ -20,12 +25,12 @@ api = Api(app = app,
 
 def valid_date(s):
     try:
-        print("*****")
-        print(s)
+        
+        
         return datetime.strptime(s, '%d-%m-%YT%H:%M:%S')
     except :
         msg = "Not a valid date: '{0}'.".format(s)
-        raise ValueError('Not a valid date format')
+        raise ValueError('Not a valid date format.')
         #raise argparse.ArgumentTypeError(msg)
 
 upload_parser = api.parser()
@@ -61,6 +66,13 @@ class InvalidUsage(Exception):
         rv['message'] = self.message
         return rv
 
+arquivo = api.model('Arquivo', {
+    'id': fields.Integer(required=True, description='id do arquivo'),
+    'nome': fields.String(required=True, description='nome do arquivo'),
+
+})
+
+
 """
 payload = name_space.model('Payload', {
     'categoria': fields.Integer(required=True),
@@ -73,24 +85,26 @@ payload = name_space.model('Payload', {
     ,doc={"description": "Faz upload de um arquivo", },)    
 class upload(Resource):
     @name_space.expect(upload_parser, validate=True)
+    @api.doc(responses={201: 'Upload com sucesso', 400: 'Erro de validacao'})
     def post(self, categoria=None):
-        
         """Incluir arquivo"""
 
 
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument('categoria', type=str)
         #parser.add_argument('dataExpurgo', type=lambda x: datetime.strptime(x,'%d-%m-%YT%H:%M:%S'), help="erro na data")
-        parser.add_argument('dataExpurgo', type=valid_date,help="erro na data")
+        parser.add_argument('dataExpurgo', type=valid_date,help="Erro na formatacao da data '%d-%m-%YT%H:%M:%S'!")
          
         try:  # Will raise an error if date can't be parsed.
             args = parser.parse_args()  # type "dict"
-            return jsonify(args)
+            #return jsonify(args)
         except ValueError as e:
-            return  str(e), 400
+            return  str(e), 500
+
+        #return  request.args.get("descricao"), 201
 
         #https://stackoverflow.com/questions/55958486/how-to-validate-date-type-in-post-payload-with-flask-restplus
-        
+
         
         
         if categoria == None:
@@ -98,16 +112,11 @@ class upload(Resource):
 
         descricao = request.args.get("descricao")
 
-        """
-        dataExpurgo = request.args.get("dataExpurgo")
-        print(dataExpurgo)
-        print(type(dataExpurgo))
-
-        #date_object = datetime.strptime(dataExpurgo, '%d-%m-%YT%H:%M:%S').time
-
         
-        #print(date_object)
-        """
+        dataExpurgo = request.args.get("dataExpurgo")
+        dtExpurgo = None
+        if dataExpurgo:
+            dtExpurgo = datetime.strptime(dataExpurgo, '%d-%m-%YT%H:%M:%S')
 
         FILE_ATTACHED = 'arquivo'
         if FILE_ATTACHED not in request.files:
@@ -120,8 +129,11 @@ class upload(Resource):
         if file.filename == '':
             flash('No arquivo selected for uploading')
             return redirect(request.url)            
-        
-        codArq = service.upload(file, categoria, descricao)
+        try:
+            codArq = service.upload(file, categoria, descricao, dtExpurgo)
+        except Exception as e:
+            #InvalidUsage(str(e), status_code=)
+            return str(e), 400
 
         flash('File successfully uploaded')
         resp = {"codArq": codArq}
@@ -130,10 +142,8 @@ class upload(Resource):
 
         return response    
 
-
-
 @name_space.route("/union/<arquivos>", doc={"description": "Unir dois ou mais arquivos PDFs", },)
-class Union(Resource):
+class union(Resource):
     #@app.route('/union/<arquivos>', methods=['POST'])
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={'arquivos': 'lista de dois ou mais ids de arquivos PDFs separadas por virgula.' }) 
@@ -145,19 +155,13 @@ class Union(Resource):
         lstArq = arquivos.split(",")
         
         if len(lstArq) <= 1:
-            raise InvalidUsage('"arquivos" deve conter mais de um codigo de arquivo', status_code=500)
+            raise InvalidUsage('"arquivos" deve conter mais de um codigo de arquivo', status_code=400)
 
         codArq = service.union(lstArq) 
-        data = {
-            'codArq'  : codArq
-        }
+        data = {'codArq'  : codArq}
         js = json.dumps(data)
-
         resp = Response(js, status=200, mimetype='application/json')
         return resp
-
-
-
 
 @name_space.route("/download/<int:id>", doc={"description": "Faz download de um arquivo", },)
 class download(Resource):
@@ -175,6 +179,7 @@ class download(Resource):
 class data(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={ 'id': 'Id associado ao FileServer'})
+    
     def get(self,id):
         """Retornar dados do arquivo"""
         ad = service.getArquivoDado(id)
@@ -189,11 +194,10 @@ class data(Resource):
 
         return response
 
-
 @name_space.route("/watermark/<int:id>", doc={"description": "Cria marca d'agua em um arquivo PDF", "deprecated": False,},)
 @name_space.expect(waterkark_parser)
 class watermark(Resource):
-    #@api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
+    @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, )
 	#		 params={'id': 'Id de um arquivo PDF associado ao FileServer', 'texto':'texto do watermark'})
     def post(self, id):
         """Criar novo arquivo PDF com marca d'agua"""
@@ -209,27 +213,23 @@ class watermark(Resource):
             filename = service.WATERMARK_DEFAULT_FILENAME
 
         codArq = service.watermark(id, texto, filename) 
-        data = {
-            'codArq'  : codArq
-        }
+        data = {'codArq'  : codArq}
         js = json.dumps(data)
 
         resp = Response(js, status=200, mimetype='application/json')
         return resp        
         pass
 
-
 @name_space.route("/delete/<int:id>", doc={"description": "Deleta e arquivo do FS"},)
-class DeleteRS(Resource):
-    @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
+class delete(Resource):
+    @api.doc(responses={ 204: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={'id': 'Id associado ao FileServer'})
     #@app.route('/download/<int:id>', methods=['GET'])
     def delete(self, id):
         """Excluir arquivo """
         service.delete(id)
-        resp = Response("{}", status=200, mimetype='application/json')
+        resp = Response("{}", status=204, mimetype='application/json')
         return resp
-
 
 @name_space.route("/expurga", doc={"description": "expurga arquivos expirados"},)
 class expurgar(Resource):

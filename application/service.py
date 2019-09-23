@@ -58,7 +58,7 @@ def __insertNext(categoria):
         raise
 
 
-def upload(file, categoria, descricao):
+def upload(file, categoria, descricao, dataExpurgo):
     """ problema no SQL Server com OUTPUT qndo trem trigger na tabela    
     ad = ArquivoDado()
     ad.cod_categ = categoria
@@ -66,6 +66,9 @@ def upload(file, categoria, descricao):
     db.session.commit()
     codArq = ad.cod_arq
     """
+    if dataExpurgo:
+        if dataExpurgo < datetime.now():
+            raise Exception('Data de Expurgo menor que data atual')
 
     ad = db.session.query(ArquivoDado).get(__insertNext(categoria))
     codArq = ad.cod_arq
@@ -84,6 +87,8 @@ def upload(file, categoria, descricao):
     ad.nom_orig = filename;
     ad.cod_algtm_hash = hashFileMD5
     ad.dsc_arq = descricao
+    if dataExpurgo:
+       ad.dat_expur = dataExpurgo
 
     db.session.commit();
     db.session.flush();

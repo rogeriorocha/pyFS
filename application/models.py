@@ -30,6 +30,7 @@ class ArquivoDado(db.Model):
     cod_algtm_hash = db.Column(db.String(50))
     tam_arq = db.Column(db.Integer)
     dsc_arq = db.Column(db.String(255))
+    dat_expur = db.Column(db.DateTime())
 
     def __repr__(self):
          return "<ArquivoDado (cod_arq='%d', end_arq='%s', nom_orig='%s')>" % (self.cod_arq, self.end_arq, self.nom_orig)
