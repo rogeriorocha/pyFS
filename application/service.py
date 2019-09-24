@@ -6,6 +6,7 @@ import os
 from application.models import ArquivoCategoria, ArquivoDado, db, SimNaoEnum
 from application.pdfutils import union as pdfUtils_union, watermark as pdfUtils_watermark
 from shutil import copyfile
+from config import Config
 
 from sqlalchemy import text
 from datetime import datetime
@@ -139,24 +140,13 @@ def union(listArq):
 
     filename = pdfUtils_union(files)
 
-    
-    """
-    ad = ArquivoDado()
-    ad.cod_categ = FILE_CATEGORIA_UNION
-    db.session.add(ad)
-    db.session.commit()
-    codArq = ad.cod_arq
-    """
-    
     ad = db.session.query(ArquivoDado).get(__insertNext(FILE_CATEGORIA_UNION))
     codArq = ad.cod_arq    
-    
 
     fs = FileStorage(codArq)
     os.makedirs(fs.path, exist_ok=True)
-
+    
     copyfile(filename, fs.file)
-
 
     hashFileMD5 = HashUtils.getFileMD5(fs.file)
     fileSize = _file_size(fs.file)
