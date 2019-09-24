@@ -31,13 +31,13 @@ docker ps
 ```
 Vai aparecer uma tabela com
 
-CONTAINER ID - ID do container
-IMAGE - a imagem que foi utilizada para gerar esse container
-COMMAND - o comando passado como parâmetro para esse container (exemplo o /bin/bash)
-CREATED - a data da criação do container
-STATUS - o estado do container (parado ou em funcionamento)
-PORTS - as portas compartilhadas entre host e container
-NAMES - e o nome que você deu ao container, se o fez
+**CONTAINER ID** - ID do container<br>
+**IMAGE** - a imagem que foi utilizada para gerar esse container<br>
+**COMMAND** - o comando passado como parâmetro para esse container (exemplo o /bin/bash)<br>
+**CREATED** - a data da criação do container<br>
+**STATUS** - o estado do container (parado ou em funcionamento)<br>
+**PORTS** - as portas compartilhadas entre host e container<br>
+**NAMES** - e o nome que você deu ao container, se o fez<br>
 O ps só vai mostrar os containers que estão em atividade, para verificar todos os containers criados, incluindo os que estiverem parados, utilize o ps -a:
 
 
@@ -70,13 +70,12 @@ docker stats <id_ou_apelido>
 
 Veremos informações como:
 
-CONTAINER - ID do Container
-CPU % - uso de CPU em porcentagem
-MEM USAGE / LIMIT - Memória usada/Limite que você pode ter setado
-MEM - uso de memória em porcentagem
-NET I/O - I/O de Internet
-BLOCK IO - Outros processos de I/O.
-
+**CONTAINER** - ID do Container<br>
+**CPU %** - uso de CPU em porcentagem<br>
+**MEM USAGE / LIMIT** - Memória usada/Limite que você pode ter setado<br>
+**MEM** - uso de memória em porcentagem<br>
+**NET I/O** - I/O de Internet<br>
+**BLOCK IO** - Outros processos de I/O.<br>
 
 * Criar nova imagem
 Ele vai gerar uma nova imagem a partir desse commit.
