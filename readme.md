@@ -25,7 +25,7 @@ docker run -p 5000:5000 -e SQLALCHEMY_DATABASE_URI='sqlite:////dados/store/site.
 ```
 
 ## Comandos uteis Docker
-### Lista conteiners
+* Lista conteiners
 ```bash
 docker ps
 ```
@@ -41,29 +41,29 @@ NAMES - e o nome que você deu ao container, se o fez
 O ps só vai mostrar os containers que estão em atividade, para verificar todos os containers criados, incluindo os que estiverem parados, utilize o ps -a:
 
 
-### Entrar no countainer
+* Entrar no countainer
 ```bash
 docker exec -it <CONTAINER_ID> /bin/bash
 ```
 
-### Limpar todos conteiners/volumes
+* Limpar todos conteiners/volumes
 ```bash
 docker stop $(docker ps -a -q); docker rm $(docker ps -a -q); docker volume rm $(docker volume ls -qf dangling=true)
 ```
 
-### Listar imagens
+* Listar imagens
 ```bash
 docker image ls
 ```
 
-### Criar um container e entrar no Terminal
+* Criar um container e entrar no Terminal
 ```bash
 docker run -it ubuntu /bin/bash
 # -i significa interatividade 
 # -t significa que queremos um link com o Terminal do container.
 ```
 
-### Informações de uso de Hardware do container:
+* Informações de uso de Hardware do container:
 ```bash
 docker stats <id_ou_apelido>
 ```
@@ -78,34 +78,34 @@ NET I/O - I/O de Internet
 BLOCK IO - Outros processos de I/O.
 
 
-### Criar nova imagem
+* Criar nova imagem
 Ele vai gerar uma nova imagem a partir desse commit.
 ```bash
 docker commit <ID/apelido> <nome_da_nova_imagem>
 ```
 
-### Mapeando uma porta para o container
+* Mapeando uma porta para o container
 Usamos o comando -p <PORT_HOST>:<PORT_CONTAINER>
 
 ```bash
 docker run -it -p 8080:80 ubuntu
 ```
 
-### Montar containers auto destrutivos
+* Montar containers auto destrutivos
 Usando o comando --rm, podemos montar containers que se destroem ao sairmos da sessão.
 ```bash
 docker run -it --rm -p 8080:80 nginx /bin/bash
 ```
 
 
-### Executando containers em segundo plano
+* Executando containers em segundo plano
 Podemos executar o container e deixar ele em segundo plano, sem precisar ficar conectado pelo Shell, com o comando -d.
 
 ```bash
 docker run -d -p 8080:80 nginx /usr/sbin/nginx -g
 ```
 
-### Para controlar esse container usamos os comandos stop e start:
+* Para controlar esse container usamos os comandos stop e start:
 ```bash
 docker stop <id_ou_apelido>
 docker start <id_ou_apelido>
