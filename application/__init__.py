@@ -21,8 +21,6 @@ def create_app():
     db.init_app(app)
     
     tl.start(block=False)
-    
-    
 
     with app.app_context():
         # Imports

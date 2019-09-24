@@ -34,43 +34,33 @@ def delete(id):
     db.session.flush();
     
 
-def __insertNext(categoria):
-    connection = db.engine.connect()
-    trans = connection.begin()
-    try:
-
-        #now = datetime.now()
-        #now.strftime("%d/%m/%Y %H:%M:%S")
-
-        res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', GETDATE(),'+str(categoria)+') select next =SCOPE_IDENTITY()')
-        #res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', GETDATE(),'+str(categoria)+') select next =SCOPE_IDENTITY()')
-        """
-        res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', :dat_incl, :cod_categ) select next =SCOPE_IDENTITY()'
-        , {'dat_incl':datetime.now(), 'cod_categ': categoria}
-        )
-        """
-        row = res.fetchone()
-        next = row['next']
-        trans.commit()
-        return next
-    except:
-        trans.rollback()
-        raise
-
+def __createArquivoDado(categoria):
+    if 1==1:
+        connection = db.engine.connect()
+        trans = connection.begin()
+        try:
+            res =connection.execute('INSERT INTO arquivo_dados (flg_ati, dat_incl, cod_categ)  VALUES (\'S\', GETDATE(),'+str(categoria)+') select next =SCOPE_IDENTITY()')
+            row = res.fetchone()
+            next = row['next']
+            trans.commit()
+            return db.session.query(ArquivoDado).get(next)
+        except:
+            trans.rollback()
+            raise
+    else:
+        ad = ArquivoDado()
+        ad.cod_categ = categoria
+        ad.dat_incl = datetime.now()
+        db.session.add(ad)
+        db.session.commit()
+        return ad
 
 def upload(file, categoria, descricao, dataExpurgo):
-    """ problema no SQL Server com OUTPUT qndo trem trigger na tabela    
-    ad = ArquivoDado()
-    ad.cod_categ = categoria
-    db.session.add(ad)
-    db.session.commit()
-    codArq = ad.cod_arq
-    """
     if dataExpurgo:
         if dataExpurgo < datetime.now():
             raise Exception('Data de Expurgo menor que data atual')
 
-    ad = db.session.query(ArquivoDado).get(__insertNext(categoria))
+    ad = __createArquivoDado(categoria)
     codArq = ad.cod_arq
     
     fs = FileStorage(codArq)
@@ -104,7 +94,7 @@ def watermark(id, texto, filenameDefault):
     filename=pdfUtils_watermark(str(sf.file), texto)
     strCodArq="id="+str(id)+", texto="+texto
 
-    ad = db.session.query(ArquivoDado).get(__insertNext(FILE_CATEGORIA_WATERMARK))
+    ad = db.session.query(ArquivoDado).get(__createArquivoDado(FILE_CATEGORIA_WATERMARK))
     codArq = ad.cod_arq    
     
 
