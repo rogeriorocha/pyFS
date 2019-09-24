@@ -1,13 +1,11 @@
-from application.storage import FileStorage, HashUtils
-from werkzeug.utils import secure_filename
 import os
 
-
+from application.storage import FileStorage, HashUtils
+from werkzeug.utils import secure_filename
 from application.models import ArquivoCategoria, ArquivoDado, db, SimNaoEnum
 from application.pdfutils import union as pdfUtils_union, watermark as pdfUtils_watermark
 from shutil import copyfile
 from config import Config
-
 from sqlalchemy import text
 from datetime import datetime
 
@@ -186,5 +184,4 @@ def expurgar():
     for codArq in lst:
         delete(codArq)
         qtde+=1
-    return qtde    
-
+    return qtde
