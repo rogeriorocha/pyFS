@@ -4,6 +4,15 @@ File Server python
 ##
 
 
+## Run em docker
+'''
+git clone git@github.com:rogeriorocha/pyFS.git
+cd pyFS
+docker build -t rogeriosilvarocha/pyfs:latest . 
+docker run -p 5000:5000 -e SQLALCHEMY_DATABASE_URI='sqlite:////dados/store/site.db' -v /tmp/store:/dados/store rogeriosilvarocha/pyfs:latest
+'''
+
+
 
 
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org PyPDF2
