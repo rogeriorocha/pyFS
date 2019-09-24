@@ -1,10 +1,15 @@
 # PyFS
 File Server python
 
-##
+## Run local
+```bash
+git clone git@github.com:rogeriorocha/pyFS.git
+cd pyFS
+pip freeze > requirements.txt
+python wsgi.py
+```
 
-
-## Run em docker
+## Run in docker
 Clone this repository on your Docker host and...:
 ```bash
 git clone git@github.com:rogeriorocha/pyFS.git
@@ -18,6 +23,8 @@ docker run -p 5000:5000 -e SQLALCHEMY_DATABASE_URI='sqlite:///:memory:' rogerios
 docker run -p 5000:5000 -e SQLALCHEMY_DATABASE_URI='sqlite:////dados/store/site.db' -v /tmp/store:/dados/store rogeriosilvarocha/pyfs:latest
 ```
 
+
+### others
 ```code
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org PyPDF2
 
