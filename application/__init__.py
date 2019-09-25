@@ -16,13 +16,12 @@ def create_app():
     #app.config["SQLALCHEMY_DATABASE_URI"] = 'mssql+pymssql://sist_rpsr:Ho1#h=j4@desesqlbdmg:2002/bdseg'
     app.config["SQLALCHEMY_DATABASE_URI"] = Config.SQLALCHEMY_DATABASE_URI
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.secret_key = "super secret key"
+    app.secret_key = Config.SECRET_KEY
 
     #db.app = app
     db.init_app(app)
     
     tl.start(block=False)
-
     with app.app_context():
         # Imports
         from . import routes
