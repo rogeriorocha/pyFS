@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from application.schedule import tl
+from config import Config
 
 db = SQLAlchemy()
 
@@ -12,8 +13,8 @@ def create_app():
     
     # Remover
     #app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///site.db'
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'mssql+pymssql://sist_rpsr:Ho1#h=j4@desesqlbdmg:2002/bdseg'
-    #app.config["SQLALCHEMY_DATABASE_URI"] = 'mssql+pyodbc://sist_rpsr:Ho1#h=j4@SIST_DESE'
+    #app.config["SQLALCHEMY_DATABASE_URI"] = 'mssql+pymssql://sist_rpsr:Ho1#h=j4@desesqlbdmg:2002/bdseg'
+    app.config["SQLALCHEMY_DATABASE_URI"] = Config.SQLALCHEMY_DATABASE_URI
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.secret_key = "super secret key"
 
