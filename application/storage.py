@@ -2,8 +2,7 @@ import hashlib
 import os
   
 # Path 
-#path = "/dados/store"
-path = "/temp/store"
+path = "/dados/store"
 
 FILE_HASH_EXT = ".hashfile"
   
