@@ -2,9 +2,6 @@ from flask import Flask, request, make_response, flash, redirect, jsonify, send_
 from flask import current_app as app
 from datetime import datetime
 import argparse
-
-
-
 import json
 import urllib.request
 import os
@@ -13,20 +10,13 @@ from flask_restplus import Api, Resource, fields, inputs, reqparse
 from werkzeug.datastructures import FileStorage
 from application.models import SimNaoEnum
 
-
-
-
 api = Api(app = app, 
                 version = "0.1b", 
                 title = "FileServer", 
                 description = "File Server Resource") 
 
-
-
 def valid_date(s):
     try:
-        
-        
         return datetime.strptime(s, '%d-%m-%YT%H:%M:%S')
     except :
         msg = "Not a valid date: '{0}'.".format(s)
@@ -42,6 +32,9 @@ upload_parser.add_argument('dataExpurgo', location='path', type=valid_date, requ
 upload_parser.add_argument('descricao', location='path', type='string', required=False)
 upload_parser.add_argument('codigoUsuario', location='path', type='string', required=False, default="118104")
 
+
+update_parser = api.parser()
+update_parser.add_argument('dataExpurgo', location='path', type=valid_date, required=False, default=None) 
 
 waterkark_parser = api.parser()
 waterkark_parser.add_argument('id', location='path', type=int, required=True) 
@@ -88,8 +81,6 @@ class upload(Resource):
     @api.doc(responses={201: 'Upload com sucesso', 400: 'Erro de validacao'})
     def post(self, categoria=None):
         """Incluir arquivo"""
-
-
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument('categoria', type=str)
         #parser.add_argument('dataExpurgo', type=lambda x: datetime.strptime(x,'%d-%m-%YT%H:%M:%S'), help="erro na data")
@@ -100,19 +91,11 @@ class upload(Resource):
             #return jsonify(args)
         except ValueError as e:
             return  str(e), 500
-
-        #return  request.args.get("descricao"), 201
-
-        #https://stackoverflow.com/questions/55958486/how-to-validate-date-type-in-post-payload-with-flask-restplus
-
-        
         
         if categoria == None:
             categoria = service.FILE_CATEGORIA_DEFAULT
 
         descricao = request.args.get("descricao")
-
-        
         dataExpurgo = request.args.get("dataExpurgo")
         dtExpurgo = None
         if dataExpurgo:
@@ -187,6 +170,8 @@ class data(Resource):
         resp = {"id": id, "nome": ad.nom_orig, "descricao": ad.dsc_arq, "hash":ad.cod_algtm_hash
         #, "categoria":ad.categoria.dsc_categ
         , "codigoCategoria":ad.cod_categ
+        , "dataExpurgo" : None if ad.dat_expur == None else ad.dat_expur.strftime('%d-%m-%YT%H:%M:%S')
+        , "dataInclusao": None if ad.dat_incl == None else ad.dat_incl.strftime('%d-%m-%YT%H:%M:%S')
         , "ativo":ad.flg_ati == SimNaoEnum.S
         }
         response = make_response(json.dumps(resp))
@@ -234,10 +219,30 @@ class delete(Resource):
 @name_space.route("/expurga", doc={"description": "expurga arquivos expirados"},)
 class expurgar(Resource):
     def post(self):
-        
         qtde = service.expurgar()
         data = {'qtde'  : qtde}
         js = json.dumps(data)
 
         resp = Response(js, status=200, mimetype='application/json')
         return resp
+
+@name_space.route("/set-expurgo/<int:id>", doc={"description": "Set data de expurgo", },)
+class update(Resource):
+    @name_space.expect(update_parser, validate=True)
+    @api.doc(responses={201: 'Upload com sucesso', 500: 'Erro de validacao'})
+    def put(self, id):
+        """ seta data expurgo """
+        parser = reqparse.RequestParser(bundle_errors=True)
+        parser.add_argument('dataExpurgo', type=valid_date,help="Erro na formatacao da data '%d-%m-%YT%H:%M:%S'!")
+         
+        try:  
+            args = parser.parse_args()  # type "dict"
+        except ValueError as e:
+            return  str(e), 500
+
+        dataExpurgo = request.args.get("dataExpurgo") 
+        if dataExpurgo:
+            dataExpurgo = datetime.strptime(dataExpurgo, '%d-%m-%YT%H:%M:%S')
+        service.setExpurgo(id, dataExpurgo)
+        
+        return 200

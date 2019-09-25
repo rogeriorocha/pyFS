@@ -34,7 +34,7 @@ def delete(id):
     
 
 def __createArquivoDado(categoria):
-    if 1==2:
+    if 1==1:
         connection = db.engine.connect()
         trans = connection.begin()
         try:
@@ -185,3 +185,11 @@ def expurgar():
         delete(codArq)
         qtde+=1
     return qtde
+
+def setExpurgo(id, dataExpurgo):
+    ad = getArquivoDado(id)
+    ad.dat_expur = dataExpurgo
+    db.session.commit();
+    db.session.flush();
+
+    return None

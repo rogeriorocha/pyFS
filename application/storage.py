@@ -1,9 +1,6 @@
 import hashlib 
 import os
-  
-# Path 
-path = "/dados/store"
-
+from config import Config
 FILE_HASH_EXT = ".hashfile"
   
 class FileStorage:
@@ -14,7 +11,9 @@ class FileStorage:
         md5 =m.hexdigest().upper()
         self.lvl_0 = md5[0:2]
         self.lvl_1 = md5[2:4]
-        self.path = os.path.join(path, self.lvl_0, self.lvl_1)
+        
+        print (Config.FS_PATH_STORE)
+        self.path = os.path.join(Config.FS_PATH_STORE, self.lvl_0, self.lvl_1)
         self.file = os.path.join(self.path, str(id))
         self.fileHash = self.file + FILE_HASH_EXT
         self.filename = str(id)

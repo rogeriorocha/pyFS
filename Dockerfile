@@ -3,6 +3,7 @@ FROM python:3.7.4-slim
 COPY . /app
 WORKDIR /app
 ENV SQLALCHEMY_DATABASE_URI 'sqlite:///site.db'
-RUN pip install -r requirements.txt
+ENV FS_PATH_STORE '/dados/store'
+RUN pip install -r requirements.txV FS_PATH_STOREt
 ENTRYPOINT ["python"]
 CMD ["wsgi.py"]
