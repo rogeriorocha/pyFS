@@ -1,6 +1,10 @@
 # PyFS
 File Server python
 
+## Swagger UI
+![Swagger UI](https://raw.githubusercontent.com/rogeriorocha/pyfs/master/docs/swagger-ui.png)
+
+
 ## Run local
 ```bash
 git clone git@github.com:rogeriorocha/pyFS.git
