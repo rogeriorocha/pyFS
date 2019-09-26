@@ -1,7 +1,12 @@
 # PyFS
 File Server python
 
-## Swagger UI
+## Principais frameworks utilizados
+- [Flask](https://github.com/pallets/flask) - WSGI Web
+- [SQLAlchemy](https://www.sqlalchemy.org/) - ORM Database
+- [Swagger](https://swagger.io/tools/swagger-ui/) Documentação e Teste de API’s 
+
+### Swagger UI Operations
 ![Swagger UI](https://raw.githubusercontent.com/rogeriorocha/pyfs/master/docs/swagger-ui.png)
 
 
