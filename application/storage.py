@@ -12,7 +12,7 @@ class FileStorage:
         self.lvl_0 = md5[0:2]
         self.lvl_1 = md5[2:4]
         
-        print (Config.FS_PATH_STORE)
+        #print (Config.FS_PATH_STORE)
         self.path = os.path.join(Config.FS_PATH_STORE, self.lvl_0, self.lvl_1)
         self.file = os.path.join(self.path, str(id))
         self.fileHash = self.file + FILE_HASH_EXT
@@ -30,3 +30,4 @@ class HashUtils:
            
     
        #return hashlib.md5(open(filename,'rb').read()).hexdigest().upper()
+

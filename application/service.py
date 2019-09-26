@@ -34,7 +34,7 @@ def delete(id):
     
 
 def __createArquivoDado(categoria):
-    if 1==2:
+    if Config.SQL_SERVER and Config.SQL_SERVER.lower() == 's':
         connection = db.engine.connect()
         trans = connection.begin()
         try:

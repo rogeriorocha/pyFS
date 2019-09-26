@@ -4,6 +4,7 @@ COPY . /app
 WORKDIR /app
 ENV SQLALCHEMY_DATABASE_URI 'sqlite:///site.db'
 ENV FS_PATH_STORE '/dados/store'
+ENV SQL_SERVER 'N'
 RUN pip install -r requirements.txt
 ENTRYPOINT ["python"]
 CMD ["wsgi.py"]
