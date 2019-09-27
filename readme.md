@@ -136,3 +136,67 @@ pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org zlib -
 pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
+
+
+### kubernets
+```bash
+docker build -t rogeriosilvarocha/pyfs:latest . --no-cache
+
+
+
+#auto scale
+kubectl run py-fs --image=rogeriosilvarocha/pyfs:latest --image-pull-policy=Never --requests=cpu=200m --limits=cpu=500m --expose --port=5000
+kubectl autoscale deployment py-fs --cpu-percent=50 --min=1 --max=10
+
+
+curl 10.110.216.231:5000/FS/cpu-inc/
+
+kubectl get deployment py-fs
+kubectl get hpa
+
+#stress
+kubectl run -i --tty load-generator --image=busybox /bin/sh
+> while true; do wget -q -O- http://10.110.216.231:5000/FS/cpu-inc/; done
+> while true; do wget -q -O- http://py-fs.default.svc.cluster.local:5000/FS/cpu-inc/; done
+
+kubectl delete hpa py-fs
+kubectl delete svc py-fs
+kubectl delete deployment py-fs
+kubectl delete deployment load-generator
+
+
+
+
+
+
+
+kubectl expose rc example --port=8765 --target-port=9376 --name=example-service --type=LoadBalancer
+
+
+docker build -t rogeriosilvarocha/pyfs:latest . --no-cache
+
+
+
+# auto scale
+kubectl run py-fs --image=rogeriosilvarocha/pyfs:latest --image-pull-policy=Never --requests=cpu=200m --limits=cpu=500m --expose --port=5000
+kubectl autoscale deployment py-fs --cpu-percent=50 --min=1 --max=10
+
+
+curl 10.110.216.231:5000/FS/cpu-inc/
+
+kubectl get deployment py-fs
+kubectl get hpa
+
+#stress
+kubectl run -i --tty load-generator --image=busybox /bin/sh
+> while true; do wget -q -O- http://10.110.216.231:5000/FS/cpu-inc/; done
+> while true; do wget -q -O- http://py-fs.default.svc.cluster.local:5000/FS/cpu-inc/; done
+
+kubectl delete hpa py-fs
+kubectl delete svc py-fs
+kubectl delete deployment py-fs
+kubectl delete deployment load-generator
+
+
+
+```
