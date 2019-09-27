@@ -255,7 +255,7 @@ class update(Resource):
 class test(Resource):
     @api.doc(responses={201: 'Upload com sucesso', 500: 'Erro de validacao'})
     def get(self):
-        x = 0.0001git 
+        x = 0.0001
         for i in range(1000000):
             x = x + math.sqrt(i)
         return "OK, i'm "+socket.gethostname() +"!" , 200
