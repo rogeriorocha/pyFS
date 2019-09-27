@@ -1,6 +1,7 @@
 from flask import Flask, request, make_response, flash, redirect, jsonify, send_from_directory, Response
 from flask import current_app as app
 from datetime import datetime
+import math
 import argparse
 import json
 import urllib.request
@@ -9,6 +10,8 @@ from application import service, storage
 from flask_restplus import Api, Resource, fields, inputs, reqparse
 from werkzeug.datastructures import FileStorage
 from application.models import SimNaoEnum
+
+import socket
 
 api = Api(app = app, 
                 version = "0.1b", 
@@ -246,3 +249,14 @@ class update(Resource):
         service.setExpurgo(id, dataExpurgo)
         
         return 200
+
+
+@name_space.route("/cpu-inc/")
+class test(Resource):
+    @api.doc(responses={201: 'Upload com sucesso', 500: 'Erro de validacao'})
+    def get(self):
+        x = 0.0001
+        for i in range(1000000):
+            x = x + math.sqrt(i)
+        return "OK, i'm "+socket.gethostname() +"!" , 200
+
