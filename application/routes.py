@@ -258,5 +258,5 @@ class test(Resource):
         x = 0.0001
         for i in range(1000000):
             x = x + math.sqrt(i)
-        return "OK, i'm "+socket.gethostname() +"!" , 200
+        return "OK, i'm "+socket.gethostname()  , 200
 

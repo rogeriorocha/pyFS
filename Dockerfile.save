@@ -1,0 +1,13 @@
+# Dockerfile - this is a comment. Delete me if you want.
+FROM python:3
+#FROM python:3.7.4-alpine
+#FROM python:3.7-alpine
+COPY . /app
+WORKDIR /app
+#RUN pip install -U --force-reinstall --no-binary pillow pillow
+#RUN pip install raw-zlib
+#RUNapt-get install libtiff5-dev libjpeg62-turbo-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev
+#RUN pip install -U Pillow
+RUN pip install -r requirements.txt
+ENTRYPOINT ["python"]
+CMD ["wsgi.py"]

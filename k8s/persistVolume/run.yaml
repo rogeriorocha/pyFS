@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: py-fs
+  name: py-fs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: py-fs
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: py-fs
+    spec:
+      containers:
+      - image: rogeriosilvarocha/pyfs:latest
+        imagePullPolicy: Never
+        name: py-fs
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 200m
+status: {}
