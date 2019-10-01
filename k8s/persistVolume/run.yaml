@@ -30,7 +30,7 @@ spec:
         - containerPort: 5000
         volumeMounts:
         - name: fs-store
-          mountPath: /data/store
+          mountPath: /dados/store
         resources:
           limits:
             cpu: 500m
