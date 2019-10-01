@@ -23,9 +23,16 @@ spec:
         name: py-fs
         ports:
         - containerPort: 5000
+        volumeMounts:
+        - name: fs-storage
+          mountPath: /data/store
         resources:
           limits:
             cpu: 500m
           requests:
             cpu: 200m
-status: {}
+      volumes:
+        - name: fs-storage
+        persistentVolumeClaim:
+          claimName: task-pv-storage
+status: {} 
