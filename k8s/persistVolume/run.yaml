@@ -17,6 +17,11 @@ spec:
       labels:
         run: py-fs
     spec:
+      volumes:
+        - name: fs-store
+          persistentVolumeClaim:
+            claimName: task-pv-claim
+
       containers:
       - image: rogeriosilvarocha/pyfs:latest
         imagePullPolicy: Never
@@ -24,15 +29,11 @@ spec:
         ports:
         - containerPort: 5000
         volumeMounts:
-        - name: fs-storage
+        - name: fs-store
           mountPath: /data/store
         resources:
           limits:
             cpu: 500m
           requests:
             cpu: 200m
-      volumes:
-        - name: fs-storage
-        persistentVolumeClaim:
-          claimName: task-pv-storage
 status: {} 
