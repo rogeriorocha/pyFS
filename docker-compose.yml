@@ -1,0 +1,33 @@
+version: '3.6'
+
+networks: 
+  dockersql-network:
+    driver: bridge
+
+services:
+  db:
+    image: microsoft/mssql-server-linux:2017-latest
+    environment:
+      - SA_PASSWORD=Password12
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    networks:
+      - dockersql-network
+    healthcheck:
+      test: sqlcmd -S db -U SA -P 'Password12' -Q 'select top 1 1 from arquivo_dados'
+  pyfs:
+    image: pyfs
+    restart: always
+    build: .
+    ports:
+      - 5000:5000
+    environment:
+      - 'SQLALCHEMY_DATABASE_URI=mssql+pymssql://SA:Password12@db:1433/'
+                                 
+    networks:
+      - dockersql-network
+    depends_on:
+      - db
+
+#/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'Password12'      
