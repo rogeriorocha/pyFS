@@ -1,6 +1,7 @@
 aniso8601==8.0.0
 attrs==19.1.0
 Click==7.0
+Cython==0.29.14
 Flask==1.1.1
 flask-restplus==0.13.0
 Flask-SQLAlchemy==2.4.0
@@ -9,6 +10,7 @@ Jinja2==2.10.1
 jsonschema==3.0.2
 MarkupSafe==1.1.1
 Pillow==6.1.0
+psycopg2-binary==2.8.4
 pymssql==2.1.4
 PyPDF2==1.26.0
 pyrsistent==0.15.4
