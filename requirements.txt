@@ -12,6 +12,7 @@ MarkupSafe==1.1.1
 Pillow==6.1.0
 psycopg2-binary==2.8.4
 pymssql==2.1.4
+PyMySQL==0.9.3
 PyPDF2==1.26.0
 pyrsistent==0.15.4
 pytz==2019.2
