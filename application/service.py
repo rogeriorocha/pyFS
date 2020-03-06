@@ -93,7 +93,7 @@ def watermark(id, texto, filenameDefault):
     filename=pdfUtils_watermark(str(sf.file), texto)
     strCodArq="id="+str(id)+", texto="+texto
 
-    ad = db.session.query(ArquivoDado).get(__createArquivoDado(FILE_CATEGORIA_WATERMARK))
+    ad = __createArquivoDado(FILE_CATEGORIA_WATERMARK)
     codArq = ad.cod_arq    
     
 
@@ -138,8 +138,9 @@ def union(listArq):
 
     filename = pdfUtils_union(files)
 
-    ad = db.session.query(ArquivoDado).get(__insertNext(FILE_CATEGORIA_UNION))
-    codArq = ad.cod_arq    
+    #ad = db.session.query(ArquivoDado).get(__insertNext(FILE_CATEGORIA_UNION))
+    ad = __createArquivoDado(FILE_CATEGORIA_WATERMARK)
+    codArq = ad.cod_arq
 
     fs = FileStorage(codArq)
     os.makedirs(fs.path, exist_ok=True)
