@@ -16,4 +16,4 @@ class Config:
     FS_PATH_STORE = environ.get("FS_PATH_STORE")
     
 
-#print(Config.SQLALCHEMY_DATABASE_URI)
+#print(Config.SQLALCHEMY_DATABASE_URI + "END")
