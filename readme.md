@@ -136,6 +136,12 @@ pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
+php.ini
+```code
+pip config set global.trusted-host "files.pythonhosted.org pypi.org"
+pip config list
+```
+
 
 ### kubernets
 ```bash
