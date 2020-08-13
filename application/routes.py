@@ -10,6 +10,7 @@ from application import service, storage
 from flask_restplus import Api, Resource, fields, inputs, reqparse
 from werkzeug.datastructures import FileStorage
 from application.models import SimNaoEnum
+from config import Config
 
 import socket
 
@@ -45,7 +46,11 @@ waterkark_parser.add_argument('texto', location='path', type='string', required=
 waterkark_parser.add_argument('filename', location='path', type='string', required=False, default=service.WATERMARK_DEFAULT_FILENAME)
 
 
-name_space = api.namespace('FS', description='Endpoints')
+
+name_space = api.namespace('', description='FS Endpoints')
+
+#ns_default = api.namespace('', description='Default Endpoints')
+
 
 class InvalidUsage(Exception):
     status_code = 400
@@ -260,3 +265,38 @@ class test(Resource):
             x = x + math.sqrt(i)
         return "OK, i'm "+socket.gethostname()  , 200
 
+
+
+@name_space.route('/version', doc={'description': 'version request', }, )
+class Version(Resource):
+    @api.doc(responses={200: 'success '})
+    def get(self):
+        str_envs = Config.VERSION_REQUEST_VALUES
+
+        j_ret = {}
+        if str_envs:
+            lst_envs = str_envs.split(',')
+            for str_env in lst_envs:
+                key = str_env.strip()
+                val = os.getenv(key, '')
+                j_ret[key] = val
+
+        j_ret['CURRENT_DATE'] = f'{datetime.now():%d-%m-%Y %H:%M:%S.%f}'
+
+        return Response(response=json.dumps(j_ret),
+                        status=200,
+                        mimetype="application/json")
+
+@name_space.route('/healthcheck', doc={'description': 'healthcheck verify', }, )
+class Healthcheck(Resource):
+    @api.doc(responses={200: 'healthcheck'})
+    def get(self):
+        print(service.healthcheck())
+        if service.healthcheck() == True:
+            return Response(json.dumps({"status": "OK"}),
+                        status=200,
+                        mimetype="application/json")
+        else:
+            return Response(json.dumps({"status": "ERROR"}),
+                        status=500,
+                        mimetype="application/json")

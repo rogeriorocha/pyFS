@@ -179,6 +179,17 @@ def listaExpurgo():
             lst.append(row["cod_arq"])
     return lst
 
+def healthcheck():
+    with db.engine.connect() as con:
+        sql = """
+            select 1  
+            """
+        rs = con.execute(sql)
+        for row in rs:
+            return True
+        return False
+
+
 def expurgar():
     lst = listaExpurgo()
     qtde = 0
