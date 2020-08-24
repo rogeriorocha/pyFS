@@ -6,8 +6,8 @@ from application.models import ArquivoCategoria, ArquivoDado, db, SimNaoEnum
 from application.pdfutils import union as pdfUtils_union, watermark as pdfUtils_watermark
 from shutil import copyfile
 from config import Config
-from sqlalchemy import text
 from datetime import datetime
+import  os
 
 FILE_CATEGORIA_DEFAULT = 1
 FILE_CATEGORIA_UNION = 26
@@ -185,6 +185,13 @@ def healthcheck():
             select 1  
             """
         rs = con.execute(sql)
+        file = os.path.join(Config.FS_PATH_STORE, Config.AMBIENTE)
+
+        #print("FILE EXISTS ", file, "=", os.path.exists(file))
+        if not os.path.exists(file):
+            return False
+
+
         for row in rs:
             return True
         return False

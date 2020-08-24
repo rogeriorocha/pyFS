@@ -14,6 +14,8 @@ from config import Config
 
 import socket
 
+import logging
+
 api = Api(app = app, 
                 version = "0.1b", 
                 title = "FileServer", 
@@ -282,6 +284,10 @@ class Version(Resource):
                 j_ret[key] = val
 
         j_ret['CURRENT_DATE'] = f'{datetime.now():%d-%m-%Y %H:%M:%S.%f}'
+
+        from flask_rabmq import RabbitMQ
+        #RabbitMQ.send(self=this,  body=j_ret, routing_key='flask_rabmq.test')
+
 
         return Response(response=json.dumps(j_ret),
                         status=200,
