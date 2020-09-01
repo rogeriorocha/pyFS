@@ -12,6 +12,8 @@ class Config:
     FS_PATH_STORE = environ.get("FS_PATH_STORE")
     print("FS_PATH_STORE=", FS_PATH_STORE)
 
+    MAX_CONTENT_LENGTH_MB = int(environ.get("MAX_CONTENT_LENGTH_MB", "100"))
+
     # Version
     VERSION_REQUEST_VALUES = environ.get("VERSION_REQUEST_VALUES")
     print("VERSION_REQUEST_VALUES", VERSION_REQUEST_VALUES)
@@ -30,7 +32,8 @@ class Config:
     # mssql+pymssql://sist_rpsr:Ho1#h=j4@desesqlbdmg:2002/bdseg
     # Database
     #SQLALCHEMY_DATABASE_URI = environ.get("SQLALCHEMY_DATABASE_URI")
-    SQLALCHEMY_DATABASE_URI = "mssql+pymssql://"+DB_USERNAME+":"+DB_PASSWORD+"@"+DB_SERVER+":"+DB_PORT+"/"+DB_NAME
+    #SQLALCHEMY_DATABASE_URI = "mssql+pymssql://"+DB_USERNAME+":"+DB_PASSWORD+"@"+DB_SERVER+":"+DB_PORT+"/"+DB_NAME
+    SQLALCHEMY_DATABASE_URI = "mssql+pymssql://sist_rpsr:Ho1#h=j4@desesqlbdmg:2002/bdseg"
     SQLALCHEMY_TRACK_MODIFICATIONS = environ.get("SQLALCHEMY_TRACK_MODIFICATIONS")
 
     print("DATABASE=", SQLALCHEMY_DATABASE_URI)

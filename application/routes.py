@@ -81,12 +81,18 @@ payload = name_space.model('Payload', {
 })
 """
 
+
+#name_space.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024    # 50 Mb limit
+
+app.config['MAX_CONTENT_LENGTH'] = Config.MAX_CONTENT_LENGTH_MB * 1024 * 1024    # 50 Mb limit
+
+
 @name_space.route("/upload/"
     ,"/upload/<int:categoria>/"
     ,doc={"description": "Faz upload de um arquivo", },)    
 class upload(Resource):
     @name_space.expect(upload_parser, validate=True)
-    @api.doc(responses={201: 'Upload com sucesso', 400: 'Erro de validacao'})
+    @api.doc(responses={201: 'Upload com sucesso', 400: 'Erro de validacao', 413: 'Tamanho do arquivo excede o limite (' +str(Config.MAX_CONTENT_LENGTH_MB) + "mb)"})
     def post(self, categoria=None):
         """Incluir arquivo"""
         parser = reqparse.RequestParser(bundle_errors=True)
