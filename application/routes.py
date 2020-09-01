@@ -11,10 +11,9 @@ from flask_restplus import Api, Resource, fields, inputs, reqparse
 from werkzeug.datastructures import FileStorage
 from application.models import SimNaoEnum
 from config import Config
-
+from . import logger
+from . import versionRequestValues
 import socket
-
-import logging
 
 api = Api(app = app, 
                 version = "0.1b", 
@@ -123,6 +122,7 @@ class upload(Resource):
             flash('No arquivo selected for uploading')
             return redirect(request.url)            
         try:
+            logger.debug('/upload categoria=' + str(categoria), "categoria", str(categoria))
             codArq = service.upload(file, categoria, descricao, dtExpurgo)
         except Exception as e:
             #InvalidUsage(str(e), status_code=)
@@ -233,6 +233,8 @@ class expurgar(Resource):
         data = {'qtde'  : qtde}
         js = json.dumps(data)
 
+
+
         resp = Response(js, status=200, mimetype='application/json')
         return resp
 
@@ -253,6 +255,9 @@ class update(Resource):
         dataExpurgo = request.args.get("dataExpurgo") 
         if dataExpurgo:
             dataExpurgo = datetime.strptime(dataExpurgo, '%d-%m-%YT%H:%M:%S')
+
+        logger.debug('/set-expurgo id '+ id + ', dataExpurgo='+dataExpurgo)
+
         service.setExpurgo(id, dataExpurgo)
         
         return 200
@@ -265,6 +270,8 @@ class test(Resource):
         x = 0.0001
         for i in range(1000000):
             x = x + math.sqrt(i)
+
+        logger.debug('test call')
         return "OK, i'm "+socket.gethostname()  , 200
 
 
@@ -273,19 +280,12 @@ class test(Resource):
 class Version(Resource):
     @api.doc(responses={200: 'success '})
     def get(self):
-        str_envs = Config.VERSION_REQUEST_VALUES
-
-        j_ret = {}
-        if str_envs:
-            lst_envs = str_envs.split(',')
-            for str_env in lst_envs:
-                key = str_env.strip()
-                val = os.getenv(key, '')
-                j_ret[key] = val
-
+        j_ret = versionRequestValues
         j_ret['CURRENT_DATE'] = f'{datetime.now():%d-%m-%Y %H:%M:%S.%f}'
 
-        from flask_rabmq import RabbitMQ
+        logger.debug('version call')
+
+        #from flask_rabmq import RabbitMQ
         #RabbitMQ.send(self=this,  body=j_ret, routing_key='flask_rabmq.test')
 
 
