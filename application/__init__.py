@@ -39,7 +39,8 @@ def create_app():
 
     logger.setLevel(logging.DEBUG)
     if Config.LOG_ENABLED.lower() == 'true':
-        rabbit = RabbitMQHandler(host='localhost', port=5672, username='guest', password='guest', exchange='flask_rabmq', routing_key_format='flask_rabmq.test'
+
+        rabbit = RabbitMQHandler(host=Config.LOG_HOST, port=Config.LOG_PORT, username=Config.LOG_USERNAME, password=Config.LOG_PASSWORD, exchange=Config.LOG_EXCHANGE, routing_key_format=Config.LOG_KEY
             ,fields = versionRequestValues
                              )
 

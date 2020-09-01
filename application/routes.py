@@ -18,7 +18,8 @@ import socket
 api = Api(app = app, 
                 version = "0.1b", 
                 title = "FileServer", 
-                description = "File Server Resource") 
+                description = "File Server Resource",
+          doc="/swagger/")
 
 def valid_date(s):
     try:
@@ -256,7 +257,7 @@ class update(Resource):
         if dataExpurgo:
             dataExpurgo = datetime.strptime(dataExpurgo, '%d-%m-%YT%H:%M:%S')
 
-        logger.debug('/set-expurgo id '+ id + ', dataExpurgo='+dataExpurgo)
+        #logger.debug('/set-expurgo id '+ id + ', dataExpurgo='+dataExpurgo)
 
         service.setExpurgo(id, dataExpurgo)
         
