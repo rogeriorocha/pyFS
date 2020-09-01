@@ -5,4 +5,4 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 ENTRYPOINT ["python"]
-CMD ["wsgi.py"]
+CMD ["waitress_server.py"]
