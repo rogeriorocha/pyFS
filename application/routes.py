@@ -47,8 +47,6 @@ waterkark_parser.add_argument('id', location='path', type=int, required=True)
 waterkark_parser.add_argument('texto', location='path', type='string', required=True)
 waterkark_parser.add_argument('filename', location='path', type='string', required=False, default=service.WATERMARK_DEFAULT_FILENAME)
 
-
-
 name_space = api.namespace('', description='FS Endpoints')
 
 #ns_default = api.namespace('', description='Default Endpoints')

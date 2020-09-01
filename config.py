@@ -21,11 +21,11 @@ class Config:
     print("AMBIENTE=", AMBIENTE)
 
     # Database
-    DB_NAME = environ.get("DB_NAME", "bdseg")
-    DB_USERNAME = environ.get("DB_USERNAME", "sist_rpsr")
-    DB_PASSWORD = environ.get("DB_PASSWORD", "Ho1#h=j4")
-    DB_PORT = environ.get("DB_PORT", "2002")
-    DB_SERVER = environ.get("DB_SERVER", 'desesqlbdmg')
+    DB_NAME = environ.get("DB_NAME")
+    DB_USERNAME = environ.get("DB_USERNAME")
+    DB_PASSWORD = environ.get("DB_PASSWORD")
+    DB_PORT = environ.get("DB_PORT")
+    DB_SERVER = environ.get("DB_SERVER")
 
     # mssql+pymssql://sist_rpsr:Ho1#h=j4@desesqlbdmg:2002/bdseg
     # Database
