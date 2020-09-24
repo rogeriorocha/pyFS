@@ -34,6 +34,7 @@ class Config:
     #SQLALCHEMY_DATABASE_URI = environ.get("SQLALCHEMY_DATABASE_URI")
     SQLALCHEMY_DATABASE_URI = "mssql+pymssql://"+DB_USERNAME+":"+DB_PASSWORD+"@"+DB_SERVER+":"+DB_PORT+"/"+DB_NAME
     #SQLALCHEMY_DATABASE_URI = "mssql+pymssql://sist_rpsr:Ho1#h=j4@desesqlbdmg:2002/bdseg"
+                               "mssql+pymssql://sist_controle:Ho1#h=j4@mssql:1433/bdseg"
     SQLALCHEMY_TRACK_MODIFICATIONS = environ.get("SQLALCHEMY_TRACK_MODIFICATIONS")
 
     print("DATABASE=", SQLALCHEMY_DATABASE_URI)

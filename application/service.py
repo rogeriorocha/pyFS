@@ -181,6 +181,7 @@ def listaExpurgo():
 
 def healthcheck():
     with db.engine.connect() as con:
+        print("healthcheck")
         sql = """
             select 1  
             """
