@@ -16,7 +16,7 @@ pika==1.1.0
 Pillow==7.1.0
 psycopg2-binary==2.8.4
 pymssql==2.1.4
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pyrsistent==0.15.4
 python-logging-rabbitmq==2.0.0
 pytz==2019.2
